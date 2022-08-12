@@ -16,13 +16,13 @@
 
 	<div class="container">
 		<div class="col-12 d-flex gap-5 mt-4 pt-3 flex-wrap" id="tricksList" style="position:relative">
-			{% for i in 0..12 %}
+			{% for trick in tricks %}
 				<div class="card col-12 col-xl-2 col-lg-3 col-sm-5 col-md-3 col-xs-12" style="">
-					<img src="https://via.placeholder.com/200x100" class="img-fluid card-img-top" alt="...">
+					<img src="assets/tricks/{{ trick.images[0].name }}" class="img-fluid card-img-top" alt="...">
 					<div class="card-body">
-						<h5 class="card-title">Ollie</h5>
-						<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-						<a href="#" class="btn btn-primary">Go somewhere</a>
+						<h5 class="card-title">
+							<a href="#">{{ trick.name }}</a>
+						</h5>
 					</div>
 				</div>
 			{% endfor %}
