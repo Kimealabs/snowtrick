@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\TrickRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\TrickRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
 class Trick
@@ -44,6 +45,9 @@ class Trick
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'tricks')]
     private Collection $category;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $modifiedAt = null;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
@@ -67,6 +71,16 @@ class Trick
         $this->name = $name;
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function makeSlug()
+    {
+        if (empty($this->slug)) {
+            $slugify = new AsciiSlugger();
+            $this->slug = $slugify->slugify($this->name);
+        }
     }
 
     public function getSlug(): ?string
@@ -227,6 +241,18 @@ class Trick
     public function removeCategory(Category $category): self
     {
         $this->category->removeElement($category);
+
+        return $this;
+    }
+
+    public function getModifiedAt(): ?\DateTimeImmutable
+    {
+        return $this->modifiedAt;
+    }
+
+    public function setModifiedAt(\DateTimeImmutable $modifiedAt): self
+    {
+        $this->modifiedAt = $modifiedAt;
 
         return $this;
     }
