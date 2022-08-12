@@ -1,0 +1,37 @@
+.home {
+    height:calc(100vh - 50px);
+    background: #fff no-repeat url('../img/snowboard.jpg');
+    background-size:cover;padding:25px
+}
+
+.arrow-link {
+    font-size:5em;
+    position:absolute;
+    bottom:50px;
+    right:50px;
+    color:#fff;
+    animation: arrow  0.6s infinite alternate ease-in-out;
+}
+
+@keyframes arrow {
+    0% {
+        transform: translateY(0px);opacity:1;
+    }
+    100% {
+        transform: translateY(-10px); opacity:0.8;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .home {
+        background-position: 60% 60%;
+     }
+    .arrow-link {
+    font-size:4em;
+    position:absolute;
+    bottom:50px;
+    margin: auto 30vw;
+    color:#fff;
+}
+    
+}
