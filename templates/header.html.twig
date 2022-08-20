@@ -1,22 +1,26 @@
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;" id="start">
-	<div class="container-fluid">
-		<a class="navbar-brand" href="#">Snowtricks</a>
-		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse  justify-content-end pr-3" id="navbarSupportedContent">
-			<ul class="navbar-nav mb-2 mb-lg-0">
-				<li class="nav-item">
-					<a class="nav-link active" aria-current="page" href="{{ path('app_home') }}">Home</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#">Sign In</a>
-				</li>
-				<li class="nav-item" style="margin-right:50px">
-					<a class="nav-link" href="#">Sign Up</a>
-				</li>
+<nav class="d-none d-md-block fixed-top bg-white bg-secondary " id="start">
+	<div class="d-flex justify-content-around align-items-center mx-5 my-2 fs-1">
+		<a class="brand flex-grow-1 text-pink text-white text-decoration-none" href="#">Snowtricks</a>
+		<div class="d-flex gap-4 fs-4 text-pink text-white">
+			<a class="active text-reset text-decoration-none" aria-current="page" href="{{ path('app_home') }}">Home</a>
+			<a class="text-reset text-decoration-none" href="#">Sign In</a>
+			<a class="text-reset text-decoration-none" href="#">Sign Up</a>
 
-			</ul>
 		</div>
 	</div>
 </nav>
+
+
+<nav class="d-block d-md-none fixed-bottom bg-white py-2" id="end">
+	<div class="d-flex justify-content-around align-items-center mx-5 fs-1">
+		<a class="active text-reset text-decoration-none" aria-current="page" href="{{ path('app_home') }}">
+			<i class="fa-solid fa-house"></i>
+		</a>
+		<a class="text-reset text-decoration-none" href="#">
+			<i class="fa-solid fa-user-plus"></i>
+		</a>
+		<a class="text-reset text-decoration-none" href="#">
+			<i class="fa-solid fa-right-to-bracket"></i>
+		</a>
+	</div>
+</div></nav>

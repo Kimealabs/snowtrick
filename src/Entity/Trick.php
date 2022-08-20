@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Trick
 {
     #[ORM\Id]
@@ -79,7 +80,7 @@ class Trick
     {
         if (empty($this->slug)) {
             $slugify = new AsciiSlugger();
-            $this->slug = $slugify->slugify($this->name);
+            $this->slug = $slugify->slug($this->name);
         }
     }
 
