@@ -5,7 +5,7 @@
 
 {% block body %}
 	<div class="home d-flex flex-column justify-content-center align-items-center">
-		<h1 class=" display-1" style=" font-size:6em;color: #f36;font-family: 'Bebas Neue' ;">Snowtricks</h1>
+		<h1 class=" display-1 text-pink" style=" font-size:6em;">Snowtricks</h1>
 		<h3 class="text-white">Parcourez et partagez les figures de snowboard</h3>
 		<div class="arrow-link">
 			<a href="#tricksList" class="text-reset">
@@ -17,12 +17,10 @@
 	<div class="container">
 		<div class="col-12 d-flex gap-5 mt-4 pt-3 flex-wrap" id="tricksList" style="position:relative">
 			{% for trick in tricks %}
-				<div class="card col-12 col-xl-2 col-lg-3 col-sm-5 col-md-3 col-xs-12" style="">
-					<img src="assets/tricks/{{ trick.images[0].name }}" class="img-fluid card-img-top" alt="...">
-					<div class="card-body">
-						<h5 class="card-title">
-							<a href="#">{{ trick.name }}</a>
-						</h5>
+				<div class="card col-12 col-xl-2 col-lg-3 col-sm-5 col-md-3 col-xs-12" onclick="#">
+					<div class="card-img" style="background-image: url('assets/tricks/{{ trick.images[0].name }}');"></div>
+					<div class="card-body d-flex justify-content-center">
+						<button href="#" class="fs-4 text-pink btn btn-light shadow">{{ trick.name }}</button>
 					</div>
 				</div>
 			{% endfor %}

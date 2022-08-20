@@ -1,7 +1,36 @@
+.bg-secondary{
+    background-color:transparent !important;
+	border-color:transparent;
+	background-image:none;
+	box-shadow:none;
+    color: #fff;	
+}
+
+a.text-pink, .text-pink {
+    color: #f36;
+    font-family: 'Bebas Neue' ;
+}
+
+.card-img {
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color:#f36;
+    height:200px;
+    transition: all 0.5s;
+}
+.card:hover {
+    cursor: pointer;
+}
+.card:hover > .card-img {
+    background-blend-mode: screen;
+}
+
 .home {
-    height:calc(100vh - 50px);
+    height:calc(100vh);
     background: #fff no-repeat url('../img/snowboard.jpg');
-    background-size:cover;padding:25px
+    background-size:cover;padding:25px;
+    color: #fff;
 }
 
 .arrow-link {
