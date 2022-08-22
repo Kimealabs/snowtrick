@@ -13,7 +13,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" rel="stylesheet">
 
-		<link href="assets/css/style.css" rel="stylesheet">
+		<link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
 	</head>
 	<body>
 		{% include 'header.html.twig' %}
@@ -24,18 +24,18 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
 	<script>
 		let el = document.querySelector('#start')
-let items = el.querySelectorAll('.text-white')
+let items = el.querySelectorAll('.text-info')
 
 window.addEventListener('scroll', function (event) {
 if (window.pageYOffset > 350) {
 el.classList.remove('bg-secondary')
 items.forEach((item) => {
-item.classList.remove('text-white')
+item.classList.remove('text-info')
 })
 } else {
 el.classList.add('bg-secondary')
 items.forEach((item) => {
-item.classList.add('text-white')
+item.classList.add('text-info')
 })
 
 }

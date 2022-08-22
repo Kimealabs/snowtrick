@@ -5,10 +5,54 @@
 
 {% block body %}
 
+	<div class="container" style="margin-top:100px" style="position:relative">
+		<div class="text-center">
+			{% if trick.images|length > 0 %}
+				<img src="{{ asset('assets/tricks/'~trick.images[0].name)}}" class="shadow rounded img-fluid" style="position:relative"/>
+			{% endif %}
+			<p class="text-pink text-center display-2" style="mix-blend-mode: multiply;position: absolute;top: 30%;left: 50%;transform: translate(-50%, -50%);">{{trick.name}}</p>
 
-	<div class="container">
-		TRICK PAGE FIRST !!!
+		</div>
+
+		<div class="text-center fs-6 mt-5 d-flex justify-content-center flex-wrap" style="column-gap:15px">
+			<span>Crée le
+				{{trick.createdAt | date('d/m/Y')}}
+				à
+				{{trick.createdAt | date('H\\hi')}}
+			</span>
+			<span class="d-none d-md-block">
+				<i class="fa-solid fa-asterisk"></i>
+			</span>
+			<span>Modifié le
+				{{trick.modifiedAt | date('d/m/Y')}}
+				à
+				{{trick.modifiedAt | date('H\\hi')}}</span>
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-md-12 col-lg-3">
+				<p class="mt-5 fs-5 text-pink">Auteur(e) :</p>
+				<div class="d-flex align-items-center gap-2">
+					<img src="https://i.pravatar.cc/100" class="rounded-circle shadow img-fluid"/>
+					<p class="fs-5">{{trick.userId.name|upper}}</p>
+				</div>
+			</div>
+			<div class="col-md-12 col-lg-7">
+				<p class="mt-5 fs-5 text-pink">Description :</p>
+				<p class="mt-0 fs-5">{{trick.description}}</p>
+			</div>
+		</div>
+		<div class="mt-5 mb-5 d-flex gap-2 justify-content-center fs-3">
+			{% for cat in trick.category %}
+				<span class="badge bg-primary">{{cat.label}}</span>
+			{% endfor %}
+		</div>
+		{# {% for image in trick.images %}
+																																																																																																									<img src="{{ asset('assets/tricks/'~image.name)}}"/>
+																																																																																																								{% endfor %} #}
+
+		{# <% for video in trick.videos %>
+																																																																																																																																																																																							<img src="{{video}}"/>
+																																																																																																																																																																																							<% endfor %> #}
 
 	</div>
-
 {% endblock %}

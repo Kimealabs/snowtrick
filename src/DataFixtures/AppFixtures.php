@@ -56,6 +56,7 @@ class AppFixtures extends Fixture
                 ->setCreatedAt(new \DateTimeImmutable('now'))
                 ->setModifiedAt(new \DateTimeImmutable('now'))
                 ->setUserId($faker->randomElement($users))
+                ->addCategory($faker->randomElement($categories))
                 ->addCategory($faker->randomElement($categories));
 
             $manager->persist($trick);

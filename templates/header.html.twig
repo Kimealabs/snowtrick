@@ -1,7 +1,7 @@
-<nav class="d-none d-md-block fixed-top bg-white bg-secondary " id="start">
+<nav class="d-none d-md-block fixed-top bg-white bg-secondary" id="start">
 	<div class="d-flex justify-content-around align-items-center mx-5 my-2 fs-1">
-		<a class="brand flex-grow-1 text-pink text-white text-decoration-none" href="#">Snowtricks</a>
-		<div class="d-flex gap-4 fs-4 text-pink text-white">
+		<a class="brand flex-grow-1 text-pink text-info text-decoration-none" href="{{ path('app_home') }}">Snowtricks</a>
+		<div class="d-flex gap-4 fs-4 text-pink text-info">
 			<a class="active text-reset text-decoration-none" aria-current="page" href="{{ path('app_home') }}">Home</a>
 			<a class="text-reset text-decoration-none" href="#">Sign In</a>
 			<a class="text-reset text-decoration-none" href="#">Sign Up</a>
@@ -10,7 +10,7 @@
 	</div>
 </nav>
 
-
+<a class="d-block d-md-none fs-3 text-pink text-decoration-none" style="position:absolute;top:15px;left:15px" href="{{ path('app_home') }}">Snowtricks</a>
 <nav class="d-block d-md-none fixed-bottom bg-white py-2" id="end">
 	<div class="d-flex justify-content-around align-items-center mx-5 fs-1">
 		<a class="active text-reset text-decoration-none" aria-current="page" href="{{ path('app_home') }}">
@@ -23,4 +23,4 @@
 			<i class="fa-solid fa-right-to-bracket"></i>
 		</a>
 	</div>
-</div></nav>
+</nav>

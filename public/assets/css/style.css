@@ -15,15 +15,16 @@ a.text-pink, .text-pink {
     background-position: center center;
     background-size: cover;
     background-repeat: no-repeat;
-    background-color:#f36;
+    background-color: rgb(255,45,90,0.5);
     height:200px;
-    transition: all 0.5s;
+    transition: all 0.2s;
 }
 .card:hover {
     cursor: pointer;
 }
 .card:hover > .card-img {
     background-blend-mode: screen;
+    background-color:#f36;
 }
 
 .home {
