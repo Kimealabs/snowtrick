@@ -56,6 +56,7 @@ class AppFixtures extends Fixture
                 ->setCreatedAt(new \DateTimeImmutable('now'))
                 ->setModifiedAt(new \DateTimeImmutable('now'))
                 ->setUserId($faker->randomElement($users))
+                ->addCategory($faker->randomElement($categories))
                 ->addCategory($faker->randomElement($categories));
 
             $manager->persist($trick);
@@ -69,7 +70,7 @@ class AppFixtures extends Fixture
 
             for ($l = 0; $l < mt_rand(1, 3); $l++) {
                 $video = new Video();
-                $video->setEmbed('<iframe width="560" height="315" src="https://www.youtube.com/embed/G9qlTInKbNE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>')
+                $video->setEmbed('https://youtu.be/PxhfDec8Ays')
                     ->setTrick($trick)
                     ->setCreatedAt(new \DateTimeImmutable('now'));
                 $manager->persist($video);

@@ -6,11 +6,14 @@ use App\Repository\VideoRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use function PHPUnit\Framework\stringContains;
+
 #[ORM\Entity(repositoryClass: VideoRepository::class)]
 class Video
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+
     #[ORM\Column]
     private ?int $id = null;
 
@@ -34,8 +37,10 @@ class Video
 
     public function getEmbed(): ?string
     {
+
         return $this->embed;
     }
+
 
     public function setEmbed(string $embed): self
     {
