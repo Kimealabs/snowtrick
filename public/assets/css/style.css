@@ -49,6 +49,8 @@ a.text-pink, .text-pink {
     right: 0;
     z-index: 100000;
     width: auto;
+    border-radius:0;
+    padding:20px;
 }
 
 @keyframes flash-animation
@@ -101,7 +103,7 @@ a.text-pink, .text-pink {
               top: 0px;
           }
           85% {
-              top: 50px;
+              top: 0px;
           }
           92% {
               top: 65px;

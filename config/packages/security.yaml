@@ -19,6 +19,7 @@ security:
       custom_authenticator: App\Security\UserAuthenticator
       logout:
         path: app_logout
+        invalidate_session: false
         # where to redirect after logout
         target: app_home
       
