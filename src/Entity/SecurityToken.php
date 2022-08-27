@@ -6,6 +6,7 @@ use App\Repository\SecurityTokenRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SecurityTokenRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class SecurityToken
 {
     #[ORM\Id]
@@ -26,6 +27,14 @@ class SecurityToken
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    #[ORM\PrePersist]
+    public function makeToken()
+    {
+        $this->setCreatedAt(new \DateTimeImmutable('NOW'));
+        $randomToken = md5(uniqid('', true));
+        $this->setToken($randomToken);
     }
 
     public function getToken(): ?string
