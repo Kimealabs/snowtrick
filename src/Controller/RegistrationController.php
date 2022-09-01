@@ -2,21 +2,30 @@
 
 namespace App\Controller;
 
-use App\Entity\SecurityToken;
 use App\Entity\User;
+use App\Service\User\UserTools;
+use App\Service\Mail\JWTService;
 use App\Form\RegistrationFormType;
+use App\Repository\UserRepository;
+use App\Security\UserAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 
 class RegistrationController extends AbstractController
 {
     #[Route('/signup', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
-    {
+    public function register(
+        UserTools $userTools,
+        Request $request,
+        UserPasswordHasherInterface $userPasswordHasher,
+        UserAuthenticatorInterface $authenticator,
+        UserAuthenticator $formAuthenticator
+    ): Response {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
@@ -30,24 +39,42 @@ class RegistrationController extends AbstractController
                 )
             );
 
-            $user->setCreatedAt(new \DateTimeImmutable('NOW'));
-            $user->setConfirmed(0);
-            $entityManager->persist($user);
+            $userTools->createUser($user);
 
-            $token = new SecurityToken();
-            $token->setConsumer($user);
-            $entityManager->persist($token);
-
-            $entityManager->flush();
-
-
-            // do anything else you need here, like send an email
-            $message = "<p><b>Bravo !</b></p><p class='mt-4'>Vous allez recevoir dans un instant un email contenant un lien afin de valider votre adresse email et finaliser votre inscription.</p>";
+            return $authenticator->authenticateUser(
+                $user,
+                $formAuthenticator,
+                $request
+            );
         }
 
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
-            'message' => $message
         ]);
+    }
+
+    #[Route('/registerValidate', name: 'app_register_validate')]
+    public function validateRegisterUser()
+    {
+        return $this->render('registration/validate_user.html.twig', []);
+    }
+
+    #[Route('/confirmEmail/{token}', name: 'app_verify_user')]
+    public function verifyUser($token, JWTService $jwt, UserRepository $userRepository, EntityManagerInterface $em)
+    {
+        if ($jwt->isValid($token) and !$jwt->isExpired($token) and $jwt->check($token, $this->getParameter('jwt_secret'))) {
+            $payload = $jwt->getPayload($token);
+            $user = $userRepository->find($payload['user_id']);
+            if ($user and !$user->isConfirmed()) {
+                $user->setConfirmed(1);
+                $em->flush($user);
+                $this->addFlash('success', 'Votre compte a été validé !');
+                return $this->redirectToRoute('app_home');
+            }
+            $this->addFlash('danger', 'Le lien est invalide ou a expiré');
+            return $this->redirectToRoute('app_login');
+        }
+        $this->addFlash('danger', 'Le lien est invalide ou a expiré');
+        return $this->redirectToRoute('app_login');
     }
 }

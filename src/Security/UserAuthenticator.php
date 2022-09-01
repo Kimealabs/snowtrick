@@ -23,6 +23,7 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
 
     public function __construct(private UrlGeneratorInterface $urlGenerator)
     {
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function authenticate(Request $request): Passport
@@ -48,7 +49,11 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
         // For example:
         $session = $request->getSession();
         $session->getFlashBag()->add('success', 'Vous êtes connecté');
-        return new RedirectResponse($this->urlGenerator->generate('app_home'));
+        if ($request->getPathInfo() != '/signup') {
+            return new RedirectResponse($this->urlGenerator->generate('app_home'));
+        } else {
+            return new RedirectResponse($this->urlGenerator->generate('app_register_validate'));
+        }
         //throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
 

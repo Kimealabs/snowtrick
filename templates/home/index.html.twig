@@ -5,13 +5,6 @@
 
 {% block body %}
 
-	{% for label, messages in app.flashes %}
-		{% for message in messages %}
-			<div class="flash alert alert-{{ label }}">
-				{{ message }}
-			</div>
-		{% endfor %}
-	{% endfor %}
 
 	<div class="home d-flex flex-column justify-content-center align-items-center">
 		<h1 class=" display-1 text-pink" style=" font-size:6em;">Snowtricks</h1>

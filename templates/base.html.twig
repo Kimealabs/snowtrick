@@ -16,6 +16,13 @@
 		<link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
 	</head>
 	<body>
+		{% for label, messages in app.flashes %}
+			{% for message in messages %}
+				<div class="flash alert alert-{{ label }}">
+					{{ message }}
+				</div>
+			{% endfor %}
+		{% endfor %}
 		{% include 'header.html.twig' %}
 		{% block body %}{% endblock %}
 		{% include 'footer.html.twig' %}

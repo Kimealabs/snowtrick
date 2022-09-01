@@ -1,21 +1,45 @@
-version: '3'
+version: "3"
 
 services:
-###> doctrine/doctrine-bundle ###
   database:
-    image: postgres:${POSTGRES_VERSION:-14}-alpine
+    platform: linux/x86_64
+    image: "mysql:latest"
+    restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+      MYSQL_ROOT_PASSWORD: snowtricks
+      MYSQL_DATABASE: snowtricks
+      MYSQL_USER: snowtricks
+      MYSQL_PASSWORD: snowtricks
+    ports:
+      - "3306:3306"
+    networks:
+      - dev
     volumes:
-      - db-data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - db_data:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin_docker_symfony
+    restart: always
+    depends_on:
+      - database
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: database
+    networks:
+      - dev
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: "mailhog"
+    restart: always
+    ports:
+      - "8025:8025"
+    networks:
+      - dev
+
+networks:
+  dev:
 
 volumes:
-###> doctrine/doctrine-bundle ###
-  db-data:
-###< doctrine/doctrine-bundle ###
+  db_data:
