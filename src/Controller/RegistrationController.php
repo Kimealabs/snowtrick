@@ -59,22 +59,24 @@ class RegistrationController extends AbstractController
         return $this->render('registration/validate_user.html.twig', []);
     }
 
-    #[Route('/confirmEmail/{token}', name: 'app_verify_user')]
+    #[Route('/validAccount/{token}', name: 'app_verify_user')]
     public function verifyUser($token, JWTService $jwt, UserRepository $userRepository, EntityManagerInterface $em)
     {
-        if ($jwt->isValid($token) and !$jwt->isExpired($token) and $jwt->check($token, $this->getParameter('jwt_secret'))) {
+        if ($jwt->isValid($token) && !$jwt->isExpired($token) && $jwt->check($token, $this->getParameter('jwt_secret'))) {
             $payload = $jwt->getPayload($token);
             $user = $userRepository->find($payload['user_id']);
-            if ($user and !$user->isConfirmed()) {
+            if ($user && !$user->isConfirmed()) {
                 $user->setConfirmed(1);
                 $em->flush($user);
                 $this->addFlash('success', 'Votre compte a été validé !');
                 return $this->redirectToRoute('app_home');
             }
-            $this->addFlash('danger', 'Le lien est invalide ou a expiré');
+            $this->addFlash('danger', 'Le lien est invalide');
             return $this->redirectToRoute('app_login');
         }
-        $this->addFlash('danger', 'Le lien est invalide ou a expiré');
+        if (!$jwt->isValid($token) || !$jwt->check($token, $this->getParameter('jwt_secret'))) {
+            $this->addFlash('danger', 'Le lien est invalide');
+        } elseif (!$jwt->isExpired($token)) $this->addFlash('danger', 'Le lien a expiré !');
         return $this->redirectToRoute('app_login');
     }
 }

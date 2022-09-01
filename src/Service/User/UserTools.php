@@ -43,4 +43,8 @@ class UserTools extends AbstractController
             compact('user', 'token')
         );
     }
+
+    public function resendValidationRequest()
+    {
+    }
 }

@@ -14,7 +14,7 @@ class TrickController extends AbstractController
     public function index(TrickRepository $tricks): Response
     {
         $tricks = $tricks->findAll();
-        return $this->render('home/index.html.twig', [
+        return $this->render('trick/home.html.twig', [
             'tricks' => $tricks,
         ]);
     }
@@ -22,7 +22,7 @@ class TrickController extends AbstractController
     #[Route('/trick/{slug}', name: 'app_trick')]
     public function trick(Trick $trick): Response
     {
-        return $this->render('trick/index.html.twig', [
+        return $this->render('trick/trick.html.twig', [
             'trick' => $trick
         ]);
     }

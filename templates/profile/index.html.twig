@@ -1,20 +1,43 @@
-{% extends 'base.html.twig' %}
+{% extends './parts/base.html.twig' %}
 
-{% block title %}Hello ProfileController!{% endblock %}
+{% block title %}Votre profil
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+	<div class="container rounded p-4 shadow-lg" style="margin-top:100px;max-width:1000px;min-height:70vh">
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-6 mt-4 fs-5">
+				<h1 class="h3 mb-3 font-weight-normal text-center mb-5">Mon compte</h1>
+				<div>
+					<i class="fa-solid fa-user"></i>
+					<b>{{ app.user.username }}</b>
+				</div>
+				<div>
+					<i class="fa-regular fa-envelope"></i>
+					{{ app.user.email }}
+				</div>
+				<div>
+					<i class="fa-regular fa-calendar"></i>
+					inscrit le
+					{{ app.user.createdAt | date('d/m/Y') }}
+					à
+					{{ app.user.createdAt | date('H:i')}}
+				</div>
+				<div>
+					Statut du compte :
+					{% if app.user.confirmed == 1 %}
+						<i class="text-success fa-regular fa-circle-check"></i>
+						Confirmé
+					{% else %}
+						<i class="text-danger fa-solid fa-circle-exclamation"></i>
+						En attente de confirmation
+						<div class="mt-5">
+							<button class="btn btn-warning shadow">Renvoyez une demande de confirmation</button>
+						</div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/wamp64/www/snowtricks/src/Controller/ProfileController.php'|file_link(0) }}">src/Controller/ProfileController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/wamp64/www/snowtricks/templates/profile/index.html.twig'|file_link(0) }}">templates/profile/index.html.twig</a></code></li>
-    </ul>
-</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}
