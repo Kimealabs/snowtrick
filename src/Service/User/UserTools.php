@@ -23,7 +23,10 @@ class UserTools extends AbstractController
         $user->setConfirmed(0);
         $this->em->persist($user);
         $this->em->flush();
+    }
 
+    public function sendToken(User $user, string $title, string $template)
+    {
         $header = [
             'typ' => 'JWT',
             'alg' => 'HS256'
@@ -38,13 +41,9 @@ class UserTools extends AbstractController
         $this->mail->send(
             'registration@snowtrick-noreply',
             $user->getEmail(),
-            'Vérification adresse email',
-            'register',
+            $title,
+            $template,
             compact('user', 'token')
         );
-    }
-
-    public function resendValidationRequest()
-    {
     }
 }

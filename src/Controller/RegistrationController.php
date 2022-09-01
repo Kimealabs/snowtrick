@@ -29,7 +29,6 @@ class RegistrationController extends AbstractController
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
-        $message = '';
         if ($form->isSubmitted() && $form->isValid()) {
             // encode the plain password
             $user->setPassword(
@@ -40,6 +39,7 @@ class RegistrationController extends AbstractController
             );
 
             $userTools->createUser($user);
+            $userTools->sendToken($user, 'Vérification du compte', 'register');
 
             return $authenticator->authenticateUser(
                 $user,
@@ -69,14 +69,26 @@ class RegistrationController extends AbstractController
                 $user->setConfirmed(1);
                 $em->flush($user);
                 $this->addFlash('success', 'Votre compte a été validé !');
-                return $this->redirectToRoute('app_home');
+                return $this->redirectToRoute('app_profile');
             }
             $this->addFlash('danger', 'Le lien est invalide');
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_home');
         }
         if (!$jwt->isValid($token) || !$jwt->check($token, $this->getParameter('jwt_secret'))) {
             $this->addFlash('danger', 'Le lien est invalide');
         } elseif (!$jwt->isExpired($token)) $this->addFlash('danger', 'Le lien a expiré !');
-        return $this->redirectToRoute('app_login');
+        return $this->redirectToRoute('app_home');
+    }
+
+    #[Route('/resendValidationAccount', name: 'app_resend_validation')]
+    public function resendValidationRequest(UserTools $userTools)
+    {
+        if ($user = $this->getUser()) {
+            if (!$user->isConfirmed()) {
+                $userTools->sendToken($user, 'Renvoi de vérification du compte', 'register');
+                return $this->redirectToRoute('app_register_validate');
+            }
+        }
+        return $this->redirectToRoute('login_home');
     }
 }
