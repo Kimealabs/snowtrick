@@ -1,0 +1,43 @@
+{% extends './parts/base.html.twig' %}
+
+{% block title %}My account
+{% endblock %}
+
+{% block body %}
+	<div class="container rounded p-4 shadow-lg" style="margin-top:100px;max-width:1000px;min-height:70vh">
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-6 mt-4 fs-5">
+				<h1 class="h3 mb-3 font-weight-normal text-center mb-5">My account</h1>
+				<div>
+					<i class="fa-solid fa-user"></i>
+					<b>{{ app.user.username }}</b>
+				</div>
+				<div>
+					<i class="fa-regular fa-envelope"></i>
+					{{ app.user.email }}
+				</div>
+				<div>
+					<i class="fa-regular fa-calendar"></i>
+					registered on
+					{{ app.user.createdAt | date('d/m/Y') }}
+					at
+					{{ app.user.createdAt | date('H:i')}}
+				</div>
+				<div>
+					Statut du compte :
+					{% if app.user.confirmed == 1 %}
+						<i class="text-success fa-regular fa-circle-check"></i>
+						Confirmed
+					{% else %}
+						<i class="text-danger fa-solid fa-circle-exclamation"></i>
+						Waiting for confirmation
+						<div class="mt-5">
+							<button class="btn btn-warning shadow">Resend a confirmation request</button>
+						</div>
+
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

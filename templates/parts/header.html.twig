@@ -1,0 +1,39 @@
+<nav class="d-none d-md-block fixed-top bg-white bg-secondary" id="start">
+	<div class="d-flex justify-content-around align-items-center mx-5 my-2 fs-1">
+		<a class="brand flex-grow-1 text-pink text-info text-decoration-none" href="{{ path('app_home') }}">Snowtricks</a>
+		<div class="d-flex gap-4 fs-4 text-pink text-info">
+			<a class="active text-reset text-decoration-none" aria-current="page" href="{{ path('app_home') }}">Home</a>
+			{% if app.user %}
+				<a class="text-reset text-decoration-none" href="{{ path('app_profile') }}">Account</a>
+				<a class="text-reset text-decoration-none" href="{{ path('app_logout') }}">Sign Out</a>
+			{% else %}
+				<a class="text-reset text-decoration-none" href="{{ path('app_login') }}">Sign In</a>
+				<a class="text-reset text-decoration-none" href="{{ path('app_register') }}">Sign Up</a>
+			{% endif %}
+		</div>
+	</div>
+</nav>
+
+<a class="d-block d-md-none fs-3 text-pink text-decoration-none" style="position:absolute;top:15px;left:15px" href="{{ path('app_home') }}">Snowtricks</a>
+<nav class="d-block d-md-none fixed-bottom bg-white py-2 border-top" id="end">
+	<div class="d-flex justify-content-around align-items-center mx-5 fs-1">
+		<a class="active text-reset text-decoration-none" aria-current="page" href="{{ path('app_home') }}">
+			<i class="fa-solid fa-house"></i>
+		</a>
+		{% if app.user %}
+			<a class="text-reset text-decoration-none" href="{{ path('app_profile') }}">
+				<i class="fa-solid fa-user"></i>
+			</a>
+			<a class="text-reset text-decoration-none" href="{{ path('app_logout') }}">
+				<i class="fa-solid fa-right-from-bracket"></i>
+			</a>
+		{% else %}
+			<a class="text-reset text-decoration-none" href="{{ path('app_register') }}">
+				<i class="fa-solid fa-user-plus"></i>
+			</a>
+			<a class="text-reset text-decoration-none" href="{{ path('app_login') }}">
+				<i class="fa-solid fa-right-to-bracket"></i>
+			</a>
+		{% endif %}
+	</div>
+</nav>

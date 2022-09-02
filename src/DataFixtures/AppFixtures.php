@@ -37,7 +37,8 @@ class AppFixtures extends Fixture
             $user->setUserName($faker->userName)
                 ->setEmail($faker->safeEmail)
                 ->setPassword($this->hasher->hashPassword($user, 'password'))
-                ->setCreatedAt(new \DateTimeImmutable('2021-' . $faker->numberBetween(1, 12) . '-' . $faker->numberBetween(1, 28) . ' ' . $faker->numberBetween(1, 23) . ':00:00'));
+                ->setCreatedAt(new \DateTimeImmutable('2021-' . $faker->numberBetween(1, 12) . '-' . $faker->numberBetween(1, 28) . ' ' . $faker->numberBetween(1, 23) . ':00:00'))
+                ->setConfirmed(0);
             $manager->persist($user);
             $users[] = $user;
         }

@@ -1,0 +1,22 @@
+{% extends './parts/base.html.twig' %}
+
+{% block title %}Registration
+{% endblock %}
+
+{% block body %}
+	<div class="container rounded p-4 shadow-lg" style="margin-top:100px;max-width:1000px;min-height:70vh">
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-6 mt-4">
+				<h1 class="h3 mb-3 font-weight-normal text-center mb-5">Registration</h1>
+
+				{{ form_start(registrationForm) }}
+				{{ form_row(registrationForm.username) }}
+				{{ form_row(registrationForm.email) }}
+				{{ form_row(registrationForm.plainPassword) }}
+				<button type="submit" class="btn btn-dark mt-4">Register</button>
+				{{ form_end(registrationForm) }}
+
+			</div>
+		</div>
+	</div>
+{% endblock %}
