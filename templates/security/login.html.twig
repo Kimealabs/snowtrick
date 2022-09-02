@@ -17,24 +17,25 @@
 			{% else %}
 				<div class="row justify-content-center">
 					<div class="col-12 col-md-6 mt-4">
-						<h1 class="h3 mb-3 font-weight-normal text-center mb-5">Connectez vous</h1>
-						<label for="inputUsername">Nom ou surnom</label>
+						<h1 class="h3 mb-3 font-weight-normal text-center mb-5">LOGIN</h1>
+						<label for="inputUsername">Username</label>
 						<input type="text" autocomplete="off" name="username" id="inputUsername" class="mb-3 form-control" value="" placeholder="name" required autofocus>
-						<label for="inputPassword">Mot de passe</label>
+						<label for="inputPassword">Password</label>
 						<input type="password" autocomplete="new-password" value="" name="password" id="inputPassword" class="form-control" required>
 						<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 						<button class="btn btn-md mt-4 btn-dark" type="submit">
-							Connecter
+							Login
 						</button>
-					</form>
-					{% if error %}
-						<div class="mt-5 alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-					{% endif %}
-
+						<div class="mt-5">
+							<a href="{{ path('app_forgotten_password') }}">Forgot Password ?</a>
+						</div>
+						{% if error %}
+							<div class="mt-5 alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+						{% endif %}
+					</div>
 				</div>
-
 			{% endif %}
 
-		</div>
+		</form>
 	</div>
 {% endblock %}
