@@ -72,7 +72,7 @@
 		{% if app.user %}
 		<hr/>
 		{{ form_start(form) }}
-		{{ form(form.content) }}
+		{{ form_row(form.content) }}
 		<button class="mt-4 btn btn-dark shadow" type="submit">Leave a comment</button>
 		{{ form_end(form) }}
 		{% endif %}
