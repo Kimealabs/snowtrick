@@ -48,7 +48,7 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
 
         // For example:
         $session = $request->getSession();
-        $session->getFlashBag()->add('success', 'Great, you are disconnected !');
+        $session->getFlashBag()->add('success', 'Great, you are login !');
         if ($request->getPathInfo() == '/signup') {
             return new RedirectResponse($this->urlGenerator->generate('app_register_validate'));
         } else {

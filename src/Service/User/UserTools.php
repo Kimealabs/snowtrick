@@ -17,15 +17,16 @@ class UserTools extends AbstractController
         $this->jwt = $jwt;
     }
 
-    public function createUser(User $user)
+    public function createUser(User $user): User
     {
         $user->setCreatedAt(new \DateTimeImmutable('NOW'));
         $user->setConfirmed(0);
         $this->em->persist($user);
         $this->em->flush();
+        return $user;
     }
 
-    public function sendToken(User $user, string $title, string $template)
+    public function sendToken(User $user, string $title, string $template): void
     {
         $header = [
             'typ' => 'JWT',
