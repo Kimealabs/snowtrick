@@ -1,0 +1,9 @@
+{% for post in posts %}
+		<div class="d-flex mt-4 shadow p-3 gap-3 align-items-center">
+			<img src="https://i.pravatar.cc/50" class="rounded-circle shadow" style="width:50px;height:50px"/>
+			<div>
+				<p>Posted by <b>{{ post.userId.username }}</b> on {{ post.createdAt | date('d/m/Y') }} at {{ post.createdAt | date('H:i') }}</p>
+				<p>{{ post.content }}</p>
+			</div>
+		</div>
+{% endfor %}

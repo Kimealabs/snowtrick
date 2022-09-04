@@ -77,14 +77,27 @@
 		{{ form_end(form) }}
 		{% endif %}
 		<hr/>
-		{% for post in posts %}
-		<div class="d-flex mt-4 shadow p-3 gap-3 align-items-center">
-			<img src="https://i.pravatar.cc/50" class="rounded-circle shadow" style="width:50px;height:50px"/>
-			<div>
-				<p>Posted by <b>{{ post.userId.username }}</b> on {{ post.createdAt | date('d/m/Y') }} at {{ post.createdAt | date('H:i') }}</p>
-				<p>{{ post.content }}</p>
-			</div>
+		<div class="posts">
 		</div>
-		{% endfor %}
+		<div class="mt-5 col-md-12 text-center">
+			<button class="btn btn-dark shadow load">Load more</button>
+			<i class="fa-2x fa-regular fa-snowflake fa-spin d-none loader"></i>
+		</div>
 	</div>
+{% endblock %}
+
+{% block JS %}
+let offset = 0
+async function listPosts() {
+	document.querySelector('.load').classList.add('d-none')
+	document.querySelector('.loader').classList.remove('d-none')
+    let response = await fetch('{{ path('app_list_posts', {id: trick.id}) }}/'+offset)
+    let data = await response.text()
+	document.querySelector('.posts').innerHTML+= data
+    offset+=3 
+	document.querySelector('.loader').classList.add('d-none')
+	document.querySelector('.load').classList.remove('d-none')
+}
+listPosts()
+document.querySelector('.load').addEventListener('click', ()=>{listPosts()})
 {% endblock %}

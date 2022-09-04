@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
 
 class TrickController extends AbstractController
 {
@@ -28,7 +29,7 @@ class TrickController extends AbstractController
     #[Route('/trick/{slug}', name: 'app_trick')]
     public function trick(Request $request, Trick $trick, PostRepository $postRepository, EntityManagerInterface $em): Response
     {
-        $posts = $postRepository->findBy(['trick' => $trick->getId()]);
+        $posts = $postRepository->findBy(['trick' => $trick->getId()], ['createdAt' => 'DESC']);
         $post = new Post();
         $form = $this->createForm(PostFormType::class, $post);
         $form->handleRequest($request);
@@ -46,6 +47,15 @@ class TrickController extends AbstractController
             'trick' => $trick,
             'posts' => $posts,
             'form' => $form->createView()
+        ]);
+    }
+
+    #[Route('/listPosts/{id}/{offset<\d+>?0}', name: 'app_list_posts')]
+    public function listPostsbyThree(PostRepository $postRepository, Trick $trick, int $offset): Response
+    {
+        $posts = $postRepository->findBy(['trick' => $trick->getId()], ['createdAt' => 'DESC'], 3, $offset);
+        return $this->render('trick/listPostsByThree.html.twig', [
+            'posts' => $posts
         ]);
     }
 }
