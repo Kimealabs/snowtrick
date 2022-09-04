@@ -32,7 +32,23 @@
 
 		</div>
 
-		<div class="text-center fs-6 mt-5 d-flex justify-content-center flex-wrap" style="column-gap:15px">
+		<div class="row justify-content-center">
+			<div class="col-md-12">
+				<p class="mt-5 fs-5 text-pink">Auteur(e) :</p>
+				<div class="d-flex align-items-center gap-2">
+					<img src="https://i.pravatar.cc/100" class="rounded-circle shadow img-fluid"/>
+					<p class="fs-5">{{trick.userId.username|upper}}</p>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<p class="mt-5 fs-5 text-pink">Figure :<span class=" text-dark">
+						{{trick.name}}</span>
+				</p>
+				<p class="mt-3 mb-0 fs-5 text-pink">Description</p>
+				<p class="mt-0 fs-5">{{trick.description}}</p>
+			</div>
+		</div>
+				<div class="text-center fs-6 mt-5 d-flex justify-content-center flex-wrap" style="column-gap:15px">
 			<span>Ajouté le
 				{{trick.createdAt | date('d/m/Y')}}
 				à
@@ -46,26 +62,29 @@
 				à
 				{{trick.modifiedAt | date('H\\hi')}}</span>
 		</div>
-		<div class="row justify-content-center">
-			<div class="col-md-12 col-lg-4">
-				<p class="mt-5 fs-5 text-pink">Auteur(e) :</p>
-				<div class="d-flex align-items-center gap-2">
-					<img src="https://i.pravatar.cc/100" class="rounded-circle shadow img-fluid"/>
-					<p class="fs-5">{{trick.userId.username|upper}}</p>
-				</div>
-			</div>
-			<div class="col-md-12 col-lg-7">
-				<p class="mt-5 fs-5 text-pink">Figure :<span class=" text-dark">
-						{{trick.name}}</span>
-				</p>
-				<p class="mt-3 mb-0 fs-5 text-pink">Description</p>
-				<p class="mt-0 fs-5">{{trick.description}}</p>
-			</div>
-		</div>
+
 		<div class="mt-5 mb-5 d-flex gap-2 justify-content-center fs-3">
 			{% for cat in trick.category %}
 				<span class="badge bg-primary">{{cat.label}}</span>
 			{% endfor %}
 		</div>
+
+		{% if app.user %}
+		<hr/>
+		{{ form_start(form) }}
+		{{ form(form.content) }}
+		<button class="mt-4 btn btn-dark shadow" type="submit">Leave a comment</button>
+		{{ form_end(form) }}
+		{% endif %}
+		<hr/>
+		{% for post in posts %}
+		<div class="d-flex mt-4 shadow p-3 gap-3 align-items-center">
+			<img src="https://i.pravatar.cc/50" class="rounded-circle shadow" style="width:50px;height:50px"/>
+			<div>
+				<p>Posted by <b>{{ post.userId.username }}</b> on {{ post.createdAt | date('d/m/Y') }} at {{ post.createdAt | date('H:i') }}</p>
+				<p>{{ post.content }}</p>
+			</div>
+		</div>
+		{% endfor %}
 	</div>
 {% endblock %}
