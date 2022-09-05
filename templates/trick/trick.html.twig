@@ -93,6 +93,10 @@ async function listPosts() {
 	document.querySelector('.loader').classList.remove('d-none')
     let response = await fetch('{{ path('app_list_posts', {id: trick.id}) }}/'+offset)
     let data = await response.text()
+	if (data == '') {
+			document.querySelector('.loader').classList.add('d-none')
+			return
+	}
 	document.querySelector('.posts').innerHTML+= data
     offset+=3 
 	document.querySelector('.loader').classList.add('d-none')

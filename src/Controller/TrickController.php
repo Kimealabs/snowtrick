@@ -50,6 +50,15 @@ class TrickController extends AbstractController
         ]);
     }
 
+    #[Route('/listTricks/{offset<\d+>?0}', name: 'app_list_tricks')]
+    public function listTricksbyFive(TrickRepository $trickRepository, int $offset): Response
+    {
+        $tricks = $trickRepository->findBy([], ['createdAt' => 'DESC'], 5, $offset);
+        return $this->render('trick/listTricksByFive.html.twig', [
+            'tricks' => $tricks
+        ]);
+    }
+
     #[Route('/listPosts/{id}/{offset<\d+>?0}', name: 'app_list_posts')]
     public function listPostsbyThree(PostRepository $postRepository, Trick $trick, int $offset): Response
     {
