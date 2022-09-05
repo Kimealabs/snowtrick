@@ -34,10 +34,10 @@ class Trick
     #[ORM\JoinColumn(nullable: false)]
     private ?User $userId = null;
 
-    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Image::class)]
+    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Image::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $images;
 
-    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Video::class)]
+    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Video::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $videos;
 
     #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Post::class)]

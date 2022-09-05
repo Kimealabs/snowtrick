@@ -38,6 +38,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $Confirmed = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Image = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -140,6 +143,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setConfirmed(bool $Confirmed): self
     {
         $this->Confirmed = $Confirmed;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->Image;
+    }
+
+    public function setImage(?string $Image): self
+    {
+        $this->Image = $Image;
 
         return $this;
     }

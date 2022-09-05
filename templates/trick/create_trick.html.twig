@@ -1,0 +1,46 @@
+{% extends './parts/base.html.twig' %}
+
+{% block title %}Create trick
+{% endblock %}
+
+{% block body %}
+	<div class="container rounded p-4 shadow-lg" style="margin-top:100px;max-width:1000px;min-height:70vh">
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-6 mt-4">
+				<h1 class="h3 mb-3 font-weight-normal text-center mb-5">Create Trick</h1>
+
+				{{ form_start(form) }}
+				{{ form_row(form.name) }}
+				{{ form_row(form.description) }}
+				{{ form_row(form.category) }}
+                {{ form_row(form.spotlight) }}
+                {{ form_row(form.images) }}
+                <div class="d-flex align-items-center justify-content-between">
+                    <label class="form-label">Add Youtube share links</label>
+                    <i class="text-success fa-3x fa-solid fa-square-plus"></i>
+                </div>
+                <input type="hidden" name="create_trick_form[videos]" value=0 id="videos" />
+                <div class="youtube d-flex flex-column">
+                </div>
+				<button type="submit" class="btn btn-dark mt-5">CREATE</button>
+				{{ form_end(form) }}
+
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block JS %}
+let video = 0
+document.querySelector('.fa-square-plus').addEventListener('click', ()=> {
+    let target = document.querySelector('.youtube')
+    let newInput = document.createElement('input')
+    newInput.setAttribute('name', 'create_trick_form[video'+video+']')
+    newInput.setAttribute('id', 'video'+video)
+    newInput.setAttribute('placeholder', 'https://youtu.be/abcdefghijkl or empty')
+    newInput.classList.add('form-control', 'mt-2')
+    target.append(newInput)
+    video++
+    document.querySelector('#videos').value = video
+})
+{% endblock %}
