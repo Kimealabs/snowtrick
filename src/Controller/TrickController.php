@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Post;
+use App\Entity\Image;
 use App\Entity\Trick;
+use App\Entity\Video;
 use App\Form\PostFormType;
+use App\Form\CreateTrickFormType;
 use App\Repository\PostRepository;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
 
 class TrickController extends AbstractController
 {
@@ -47,6 +49,85 @@ class TrickController extends AbstractController
             'trick' => $trick,
             'posts' => $posts,
             'form' => $form->createView()
+        ]);
+    }
+
+    #[Route('/create', name: 'app_create_trick')]
+    public function createTrick(Request $request, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
+    {
+        $trick = new Trick;
+        $user = $this->getUser();
+        $form = $this->createForm(CreateTrickFormType::class, $trick);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            if ($trickRepository->findBy(['slug' => $trick->getName()])) {
+                $this->addFlash('danger', 'Trick name exist yet !');
+                return $this->redirectToRoute('app_create_trick');
+            }
+
+            $trick->setCreatedAt(new \DateTimeImmutable('NOW'));
+            $trick->setUserId($user);
+
+            $spotlight = $form->get('spotlight')->getData();
+            if ($spotlight !== null) {
+                $spotlightName = md5(uniqid()) . '.' . $spotlight->guessExtension();
+                $spotlight->move($this->getParameter('upload_tricks_directory'), $spotlightName);
+                $newImage = new Image;
+                $newImage->setName($spotlightName);
+                $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                $newImage->setType('spotlight');
+                $trick->addImage(($newImage));
+            }
+
+            $images = $form->get('images')->getData();
+            if ($images !== null) {
+                foreach ($images as $image) {
+                    $imageName = md5(uniqid()) . '.' . $image->guessExtension();
+                    $image->move($this->getParameter('upload_tricks_directory'), $imageName);
+                    $newImage = new Image;
+                    if ($spotlight === null) {
+                        $spotlight = true;
+                        $newImage->setType('spotlight');
+                    }
+                    $newImage->setName($imageName);
+                    $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                    $trick->addImage(($newImage));
+                }
+            }
+
+            $videos = $form->getExtraData();
+            for ($i = 0; $i < $videos["videos"]; $i++) {
+                $youtubeCode = $videos["video" . $i];
+                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $youtubeCode, $match);
+                if (isset($match[1])) {
+                    $youtubeCode = $match[1];
+                    $newVideo = new Video;
+                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                    $newVideo->setEmbed($youtubeCode);
+                    $trick->addVideo(($newVideo));
+                }
+            }
+
+            $entityManagerInterface->persist($trick);
+            $entityManagerInterface->flush();
+
+            $this->addFlash('success', 'Your Trick is published !');
+            return $this->redirectToRoute('app_home');
+        }
+
+        return $this->render('trick/create_trick.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
+    #[Route('/listTricks/{offset<\d+>?0}', name: 'app_list_tricks')]
+    public function listTricksbyFive(TrickRepository $trickRepository, int $offset): Response
+    {
+        $tricks = $trickRepository->findBy([], ['createdAt' => 'DESC'], 5, $offset);
+        return $this->render('trick/listTricksByFive.html.twig', [
+            'tricks' => $tricks
         ]);
     }
 

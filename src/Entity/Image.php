@@ -26,6 +26,9 @@ class Image
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $modifiedAt = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Type = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class Image
     public function setModifiedAt(?\DateTimeImmutable $modifiedAt): self
     {
         $this->modifiedAt = $modifiedAt;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->Type;
+    }
+
+    public function setType(?string $Type): self
+    {
+        $this->Type = $Type;
 
         return $this;
     }

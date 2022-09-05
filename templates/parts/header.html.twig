@@ -4,6 +4,9 @@
 		<div class="d-flex gap-4 fs-4 text-pink text-info">
 			<a class="active text-reset text-decoration-none" aria-current="page" href="{{ path('app_home') }}">Home</a>
 			{% if app.user %}
+				{% if app.user.isConfirmed == 1 %}
+					<a class="text-reset text-decoration-none" href="{{ path('app_create_trick') }}">Create</a>
+				{% endif %}
 				<a class="text-reset text-decoration-none" href="{{ path('app_profile') }}">Account</a>
 				<a class="text-reset text-decoration-none" href="{{ path('app_logout') }}">Sign Out</a>
 			{% else %}
@@ -21,6 +24,11 @@
 			<i class="fa-solid fa-house"></i>
 		</a>
 		{% if app.user %}
+			{% if app.user.isConfirmed == 1 %}
+				<a class="text-reset text-decoration-none" href="{{ path('app_create_trick') }}">
+					<i class="fa-solid fa-person-snowboarding"></i>
+				</a>
+			{% endif %}
 			<a class="text-reset text-decoration-none" href="{{ path('app_profile') }}">
 				<i class="fa-solid fa-user"></i>
 			</a>

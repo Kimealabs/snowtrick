@@ -7,8 +7,14 @@
 
 	<div class="container rounded p-4 shadow-lg" style="margin-top:100px;max-width:1000px">
 		<div class="text-center">
-			{% if trick.images|length > 0 %}
-				<img src="{{ asset('assets/tricks/'~trick.images[0].name)}}" class="shadow rounded img-fluid w-100" style="position:relative"/>
+			{% if trick.images[0].name is defined %}
+				{% for image in trick.images %}
+					{% if image.type == 'spotlight' %}
+						<img src="{{ asset('upload/tricks/'~image.name)}}" class="shadow rounded img-fluid w-100" style="position:relative"/>
+					{% endif %}
+				{% endfor %}
+			{% else %}
+				<img src="{{ asset('upload/assets/img/noimg.jpg')}}" class="shadow rounded img-fluid w-100" style="position:relative"/>
 			{% endif %}
 			<p class="text-pink text-center display-2" style="mix-blend-mode: multiply;position: absolute;top: 30%;left: 50%;transform: translate(-50%, -50%);">{{trick.name}}</p>
 		</div>
@@ -16,16 +22,18 @@
 		<div class="d-flex mt-3 gap-2" style="overflow-x:auto;overflow-y:hidden">
 			{% if trick.images|length > 0 %}
 				{% for image in trick.images %}
-					<a href="{{ asset('assets/tricks/'~image.name)}}" class="glightbox3" data-gallery="gallery1">
-						<img src="{{ asset('assets/tricks/'~image.name)}}" class="rounded img-responsive" style="object-fit: cover;height:120px;width:120px;position:relative"/></a>
+					<a href="{{ asset('upload/tricks/'~image.name)}}" data-lity>
+						<img src="{{ asset('upload/tricks/'~image.name)}}" class="rounded img-responsive" style="object-fit: cover;height:120px;width:120px;position:relative"/>
+					</a>
 				{% endfor %}
 			{% endif %}
 
 			{% if trick.videos|length > 0 %}
 				{% for video in trick.videos %}
-					<div class=" embed-responsive embed-responsive-4by3" style="height:120px;max-width:120px;">
-						<iframe class="rounded embed-responsive-item" width="120px" height="120px" src="https://www.youtube.com/embed/{{ video.embed | formatYoutube}}" allowfullscreen></iframe>
-					</div>
+					<a href="https://www.youtube.com/watch?v={{ video.embed}}" data-lity style="position: relative">
+						<img src="https://img.youtube.com/vi/{{ video.embed}}/0.jpg" data-lity class="rounded img-responsive" style="object-fit: cover;height:120px;width:120px;position:relative"/>
+						<i class="fa-2x fa-brands fa-youtube text-danger bg-white rounded p-0" style="position: absolute;top:40%;left:35%"></i>
+					</a>
 				{% endfor %}
 			{% endif %}
 
@@ -36,7 +44,12 @@
 			<div class="col-md-12">
 				<p class="mt-5 fs-5 text-pink">Auteur(e) :</p>
 				<div class="d-flex align-items-center gap-2">
-					<img src="https://i.pravatar.cc/100" class="rounded-circle shadow img-fluid"/>
+					{% if trick.userId.image is defined %}
+						<img src="{{ asset('upload/profiles/'~trick.userId.image) }}" style="width:150px;height:150px" class="rounded-circle shadow img-fluid"/>
+					{% else %}
+						<img src="{{ asset('assets/img/nologo.jpg') }}" style="width:150px;height:150px" class="rounded-circle shadow img-fluid"/>
+					{% endif %}
+					
 					<p class="fs-5">{{trick.userId.username|upper}}</p>
 				</div>
 			</div>
@@ -93,6 +106,10 @@ async function listPosts() {
 	document.querySelector('.loader').classList.remove('d-none')
     let response = await fetch('{{ path('app_list_posts', {id: trick.id}) }}/'+offset)
     let data = await response.text()
+	if (data == '') {
+			document.querySelector('.loader').classList.add('d-none')
+			return
+	}
 	document.querySelector('.posts').innerHTML+= data
     offset+=3 
 	document.querySelector('.loader').classList.add('d-none')

@@ -16,6 +16,7 @@ class Youtube extends AbstractExtension
     {
         if (preg_match('#youtu#', $url)) {
             $url = parse_url($url, PHP_URL_PATH);
+            $url = str_replace("/", "", $url);
         }
 
         return $url;

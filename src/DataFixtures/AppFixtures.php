@@ -38,7 +38,8 @@ class AppFixtures extends Fixture
                 ->setEmail($faker->safeEmail)
                 ->setPassword($this->hasher->hashPassword($user, 'password'))
                 ->setCreatedAt(new \DateTimeImmutable('2021-' . $faker->numberBetween(1, 12) . '-' . $faker->numberBetween(1, 28) . ' ' . $faker->numberBetween(1, 23) . ':00:00'))
-                ->setConfirmed(0);
+                ->setConfirmed(1)
+                ->setImage($i . '.jpg');
             $manager->persist($user);
             $users[] = $user;
         }
@@ -65,13 +66,14 @@ class AppFixtures extends Fixture
             $image = new Image();
             $image->setName($trick->getName() . '.jpg')
                 ->setTrick($trick)
-                ->setCreatedAt(new \DateTimeImmutable('now'));
+                ->setCreatedAt(new \DateTimeImmutable('now'))
+                ->setType('spotlight');
             $manager->persist($image);
 
 
             for ($l = 0; $l < mt_rand(1, 3); $l++) {
                 $video = new Video();
-                $video->setEmbed('https://youtu.be/PxhfDec8Ays')
+                $video->setEmbed('PxhfDec8Ays')
                     ->setTrick($trick)
                     ->setCreatedAt(new \DateTimeImmutable('now'));
                 $manager->persist($video);
