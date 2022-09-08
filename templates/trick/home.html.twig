@@ -17,9 +17,7 @@
 	</div>
 
 	<div class="container">
-		<div class="col-12 d-flex gap-5 mt-4 pt-3 flex-wrap tricks" id="tricksList" style="position:relative">
-			
-		</div>
+		<div class="col-12 d-flex gap-5 mt-4 pt-3 flex-wrap tricks" id="tricksList" style="position:relative"></div>
 		<div class="mt-5 col-md-12 text-center">
 			<button class="btn btn-dark shadow load">Load more</button>
 			<i class="fa-2x fa-regular fa-snowflake fa-spin d-none loader"></i>
@@ -33,25 +31,53 @@
 		</div>
 	</div>
 
+	{% if app.user and app.user.isConfirmed == 1 %}
+	<div class="modal" id="warningDelete" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Warning message</h5>
+						<i class="fa-solid fa-xmark" data-dismiss="modal" aria-label="Close"></i>
+				</div>
+				<div class="modal-body">
+					<p>Are you sure to delete this trick ?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger">Delete</button>
+					<button type="button" class="btn btn-dark" data-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}
 {% endblock %}
 
 {% block JS %}
-let offset = 0
-async function listTricks() {
-	document.querySelector('.load').classList.add('d-none')
-	document.querySelector('.loader').classList.remove('d-none')
-    let response = await fetch('{{ path('app_list_tricks') }}/'+offset)
-    let data = await response.text()
-		if (data == '') {
-			document.querySelector('.loader').classList.add('d-none')
-			return
-	}
+	let offset = 0
+					async function listTricks() {
+						document.querySelector('.load').classList.add('d-none')
+						document.querySelector('.loader').classList.remove('d-none')
+						let response = await fetch('{{ path('app_list_tricks') }}/'+offset)
+						let data = await response.text()
+						if (data == '') {
+							document.querySelector('.loader').classList.add('d-none')
+							return
+						}
+													
+						document.querySelector('.tricks').innerHTML+= data
+						offset+=5 
+						document.querySelector('.loader').classList.add('d-none')
+						document.querySelector('.load').classList.remove('d-none')
+					}
+					listTricks()
+					document.querySelector('.load').addEventListener('click', ()=>{listTricks()})
 
-	document.querySelector('.tricks').innerHTML+= data
-    offset+=5 
-	document.querySelector('.loader').classList.add('d-none')
-	document.querySelector('.load').classList.remove('d-none')
-}
-listTricks()
-document.querySelector('.load').addEventListener('click', ()=>{listTricks()})
+					{% if app.user and app.user.isConfirmed == 1 %}								
+					function warningDelete(id = false) {
+						console.log(id)
+						if (id) {
+							$('#warningDelete').modal()
+						}
+					}
+					{% endif %}
 {% endblock %}

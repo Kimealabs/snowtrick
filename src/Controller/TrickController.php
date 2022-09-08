@@ -122,6 +122,11 @@ class TrickController extends AbstractController
         ]);
     }
 
+    #[Route('/update/{id}', name: 'app_update_trick')]
+    public function updateTrick(Request $request, TrickRepository $trickRepository, Trick $trick, EntityManagerInterface $entityManagerInterface): Response
+    {
+    }
+
     #[Route('/listTricks/{offset<\d+>?0}', name: 'app_list_tricks')]
     public function listTricksbyFive(TrickRepository $trickRepository, int $offset): Response
     {

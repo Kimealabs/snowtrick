@@ -1,16 +1,22 @@
 {% for trick in tricks %}
-	<div class="card col-12 col-xl-2 col-lg-3 col-sm-5 col-md-3 col-xs-12" onclick="document.location='{{ path('app_trick', {'slug': trick.slug })}}'">
+	<div class="card col-12 col-xl-2 col-lg-3 col-sm-5 col-md-3 col-xs-12">
 		{% if trick.images[0].name is defined %}
 			{% for image in trick.images %}
 				{% if image.type == 'spotlight' %}
-					<div class="card-img" style="background-image: url('upload/tricks/{{ image.name }}');"></div>
+					<div class="card-img" style="background-image: url('upload/tricks/{{ image.name }}');" onclick="document.location='{{ path('app_trick', {'slug': trick.slug })}}'"></div>
 				{% endif %}
 			{% endfor %}
 		{% else %}
-			<div class="card-img" style="background-image: url('assets/img/noimg.jpg');"></div>
+			<div class="card-img" style="background-image: url('assets/img/noimg.jpg');" onclick="document.location='{{ path('app_trick', {'slug': trick.slug })}}'"></div>
 		{% endif %}
-		<div class="card-body d-flex justify-content-center">
-			<button href="#" class="fs-4 text-pink btn btn-light shadow">{{ trick.name }}</button>
+		<div class="card-body d-flex justify-content-center gap-3 align-items-center ">
+			<button href="#" class="fs-5 text-pink btn btn-light shadow" onclick="document.location='{{ path('app_trick', {'slug': trick.slug })}}'">{{ trick.name }}</button>
+			{% if app.user and app.user.isConfirmed == 1 %}
+				<div class="d-flex gap-3">
+					<i class="fa-solid fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'id': trick.id}) }}'"></i>
+					<i class="fa-solid fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
+				</div>
+			{% endif %}
 		</div>
 	</div>
 {% endfor %}
