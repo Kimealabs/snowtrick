@@ -122,9 +122,78 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route('/update/{id}', name: 'app_update_trick')]
-    public function updateTrick(Request $request, TrickRepository $trickRepository, Trick $trick, EntityManagerInterface $entityManagerInterface): Response
+    #[Route('/update/{slug}', name: 'app_update_trick')]
+    public function updateTrick(Request $request, Trick $trick, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
     {
+        $user = $this->getUser();
+        $form = $this->createForm(CreateTrickFormType::class, $trick);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() and $form->isValid()) {
+
+            if ($trickExist = $trickRepository->findBy(['slug' => $trick->getName()])) {
+                if ($trickExist[0]->getId() != $trick->getId()) {
+                    $this->addFlash('danger', 'Trick name exist yet !');
+                    return $this->redirectToRoute('app_update_trick');
+                }
+            }
+
+            $trick->setModifiedAt(new \DateTimeImmutable('now'));
+
+            $trick->setUserId($user);
+
+            $spotlight = $form->get('spotlight')->getData();
+            if ($spotlight !== null) {
+                $spotlightName = md5(uniqid()) . '.' . $spotlight->guessExtension();
+                $spotlight->move($this->getParameter('upload_tricks_directory'), $spotlightName);
+                $newImage = new Image;
+                $newImage->setName($spotlightName);
+                $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                $newImage->setType('spotlight');
+                $trick->addImage(($newImage));
+            }
+
+            $images = $form->get('images')->getData();
+            if ($images !== null) {
+                foreach ($images as $image) {
+                    $imageName = md5(uniqid()) . '.' . $image->guessExtension();
+                    $image->move($this->getParameter('upload_tricks_directory'), $imageName);
+                    $newImage = new Image;
+                    if ($spotlight === null) {
+                        $spotlight = true;
+                        foreach ($trick->getImages() as $oldImage) {
+                            if ($oldImage->getType() == 'spotlight') $spotlight = false;
+                        }
+                        if ($spotlight) $newImage->setType('spotlight');
+                    }
+                    $newImage->setName($imageName);
+                    $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                    $trick->addImage(($newImage));
+                }
+            }
+
+            $videos = $form->getExtraData();
+            for ($i = 0; $i < $videos["videos"]; $i++) {
+                $youtubeCode = $videos["video" . $i];
+                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $youtubeCode, $match);
+                if (isset($match[1])) {
+                    $youtubeCode = $match[1];
+                    $newVideo = new Video;
+                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                    $newVideo->setEmbed($youtubeCode);
+                    $trick->addVideo(($newVideo));
+                }
+            }
+
+            $entityManagerInterface->flush();
+
+            $this->addFlash('success', 'Your Trick is updated !');
+            return $this->redirectToRoute('app_home');
+        }
+
+        return $this->render('trick/update_trick.html.twig', [
+            'form' => $form->createView(),
+            'trick' =>  $trick
+        ]);
     }
 
     #[Route('/listTricks/{offset<\d+>?0}', name: 'app_list_tricks')]
