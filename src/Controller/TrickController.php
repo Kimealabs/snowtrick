@@ -11,6 +11,7 @@ use App\Form\CreateTrickFormType;
 use App\Repository\PostRepository;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -120,6 +121,98 @@ class TrickController extends AbstractController
         return $this->render('trick/create_trick.html.twig', [
             'form' => $form->createView()
         ]);
+    }
+
+    #[Route('/update/{slug}', name: 'app_update_trick')]
+    public function updateTrick(Request $request, Trick $trick, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
+    {
+        $user = $this->getUser();
+        $form = $this->createForm(CreateTrickFormType::class, $trick);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() and $form->isValid()) {
+            $trickExist = $trickRepository->findOneBy(['slug' => $trick->getSlug()]);
+            if ($trickExist and $trick !== $trickExist) {
+                $this->addFlash('danger', 'Trick name exist yet !');
+                return $this->generateUrl('app_update_trick', ['slug' => $trick->getSlug()]);
+            }
+
+
+            $trick->setModifiedAt(new \DateTimeImmutable('now'));
+
+            $trick->setUserId($user);
+
+            $spotlight = $form->get('spotlight')->getData();
+            if ($spotlight !== null) {
+                $spotlightName = md5(uniqid()) . '.' . $spotlight->guessExtension();
+                $spotlight->move($this->getParameter('upload_tricks_directory'), $spotlightName);
+                $newImage = new Image;
+                $newImage->setName($spotlightName);
+                $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                $newImage->setType('spotlight');
+                $trick->addImage(($newImage));
+            }
+
+            $images = $form->get('images')->getData();
+            if ($images !== null) {
+                foreach ($images as $image) {
+                    $imageName = md5(uniqid()) . '.' . $image->guessExtension();
+                    $image->move($this->getParameter('upload_tricks_directory'), $imageName);
+                    $newImage = new Image;
+                    if ($spotlight === null) {
+                        $spotlight = true;
+                        foreach ($trick->getImages() as $oldImage) {
+                            if ($oldImage->getType() == 'spotlight') $spotlight = false;
+                        }
+                        if ($spotlight) $newImage->setType('spotlight');
+                    }
+                    $newImage->setName($imageName);
+                    $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                    $trick->addImage(($newImage));
+                }
+            }
+
+            $videos = $form->getExtraData();
+            for ($i = 0; $i < $videos["videos"]; $i++) {
+                $youtubeCode = $videos["video" . $i];
+                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $youtubeCode, $match);
+                if (isset($match[1])) {
+                    $youtubeCode = $match[1];
+                    $newVideo = new Video;
+                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                    $newVideo->setEmbed($youtubeCode);
+                    $trick->addVideo(($newVideo));
+                }
+            }
+
+            $entityManagerInterface->flush();
+
+            $this->addFlash('success', 'Your Trick is updated !');
+            return $this->redirectToRoute('app_home');
+        }
+
+        return $this->render('trick/update_trick.html.twig', [
+            'form' => $form->createView(),
+            'trick' =>  $trick
+        ]);
+    }
+
+    #[Route('/deleteTrick/{slug}', name: 'app_delete_trick')]
+    public function deleteTrick(string $slug, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
+    {
+        if ($user = $this->getUser()) {
+            if ($user->isConfirmed() == true) {
+                $trick = $trickRepository->findOneBy(['slug' => $slug]);
+                $images = $trick->getImages();
+                $fileSystem = new Filesystem();
+                foreach ($images as $image) {
+                    $fileSystem->remove($this->getParameter('upload_tricks_directory') . '/' . $image->getName());
+                }
+                $entityManagerInterface->remove($trick);
+                $entityManagerInterface->flush();
+                $this->addFlash('success', 'Trick Deleted !');
+                return $this->redirectToRoute('app_home');
+            }
+        }
     }
 
     #[Route('/listTricks/{offset<\d+>?0}', name: 'app_list_tricks')]

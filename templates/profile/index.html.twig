@@ -8,11 +8,15 @@
 		<div class="row justify-content-center">
 			<div class="col-12 col-md-6 mt-4 fs-5">
 				<h1 class="h3 mb-3 font-weight-normal text-center mb-5">My account</h1>
-				<div>
-					<i class="fa-solid fa-user"></i>
+				<div class="d-flex align-items-center gap-2">
+					{% if app.user.image is defined %}
+						<img src="{{ asset('upload/profiles/'~app.user.image) }}" class="rounded-circle shadow" style="width:60px;height:60px"/>
+					{% else %}
+						<img src="{{ asset('assets/img/nologo.jpg') }}" class="rounded-circle shadow" style="width:60px;height:60px"/>
+					{% endif %}
 					<b>{{ app.user.username }}</b>
 				</div>
-				<div>
+				<div class="mt-4">
 					<i class="fa-regular fa-envelope"></i>
 					{{ app.user.email }}
 				</div>
@@ -23,7 +27,7 @@
 					at
 					{{ app.user.createdAt | date('H:i')}}
 				</div>
-				<div>
+				<div class="mt-4">
 					Statut du compte :
 					{% if app.user.confirmed == 1 %}
 						<i class="text-success fa-regular fa-circle-check"></i>

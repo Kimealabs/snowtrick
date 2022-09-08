@@ -1,0 +1,102 @@
+{% extends './parts/base.html.twig' %}
+
+{% block title %}Update trick
+{% endblock %}
+
+{% block body %}
+	<div class="container rounded p-4 shadow-lg" style="margin-top:100px;max-width:1000px;min-height:70vh">
+		<div class="row justify-content-center">
+
+            <div class="text-center" style="position:relative;">
+			{% if trick.images[0].name is defined %}
+				{% for image in trick.images %}
+					{% if image.type == 'spotlight' %}
+						<img src="{{ asset('upload/tricks/'~image.name)}}" class="shadow rounded img-fluid w-100 img-trick"/>
+					{% endif %}
+				{% endfor %}
+			{% else %}
+				<img src="{{ asset('upload/assets/img/noimg.jpg')}}" class="shadow rounded img-fluid w-100 img-trick"/>
+			{% endif %}
+			    <p class="text-pink text-center display-2" style="mix-blend-mode: hard-light;position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">{{trick.name}}</p>
+				<div class="d-flex gap-4 p-3 rounded bg-white shadow" style="position:absolute;right:25px;top:15px;">
+					<i class="fa-solid link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
+					<i class="fa-solid link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
+				</div>
+		</div>
+
+        <div class="d-block d-sm-none mt-4 col-12 text-center">
+			<button class="btn btn-dark shadow" onclick="document.querySelector('.flex-sm-row').classList.remove('d-none');this.classList.add('d-none')">See medias</button>
+		</div>
+
+
+		<div class="d-flex d-none d-sm-flex mt-5 mt-md-3 flex-column flex-sm-row" style="row-gap:60px;column-gap:20px;overflow-x:auto;overflow-y:hidden">
+			{% if trick.images|length > 0 %}
+				{% for image in trick.images %}
+                <div>
+					<a href="{{ asset('upload/tricks/'~image.name)}}" data-lity>
+						<img src="{{ asset('upload/tricks/'~image.name)}}" class="rounded img-responsive img-thumbnail-trick" />
+					</a>
+                    <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow">
+					    <i class="fa-solid fs-4 link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
+					    <i class="fa-solid fs-4 link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
+				    </div>
+                </div>
+				{% endfor %}
+			{% endif %}
+
+			{% if trick.videos|length > 0 %}
+				{% for video in trick.videos %}
+                <div>
+					<a href="https://www.youtube.com/watch?v={{ video.embed}}" data-lity style="position: relative">
+						<img src="https://img.youtube.com/vi/{{ video.embed}}/0.jpg" data-lity class="rounded img-responsive img-thumbnail-trick" />
+						<i class="fa-2x fa-brands fa-youtube text-danger bg-white rounded p-0" style="position: absolute;top:0%;left:35%"></i>
+					</a>
+                    <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow">
+					    <i class="fa-solid fs-4 link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
+					    <i class="fa-solid fs-4 link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
+				    </div>
+
+                </div>
+				{% endfor %}
+			{% endif %}
+		</div>
+
+		<div class="col-12 mt-5">
+
+			{{ form_start(form) }}
+			{{ form_row(form.name) }}
+			{{ form_row(form.description) }}
+			{{ form_row(form.category) }}
+            {{ form_row(form.spotlight) }}
+            {{ form_row(form.images) }}
+            <div class="d-flex align-items-center justify-content-between">
+                <label class="form-label">Add Youtube share links</label>
+                <i class="text-success fa-3x fa-solid fa-square-plus"></i>
+            </div>
+            <input type="hidden" name="create_trick_form[videos]" value=0 id="videos" />
+            <div class="youtube d-flex flex-column">
+            </div>
+            <div class="d-flex gap-3 mt-5 justify-content-end">
+                <button class="btn btn-danger mt-5" onclick="document.location='{{ path('app_delete_trick', {'slug':trick.slug}) }}'">Delete</button>
+                <button type="submit" class="btn btn-dark mt-5">Save</button>
+            </div>
+	    	{{ form_end(form) }}
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block JS %}
+let video = 0
+document.querySelector('.fa-square-plus').addEventListener('click', ()=> {
+    let target = document.querySelector('.youtube')
+    let newInput = document.createElement('input')
+    newInput.setAttribute('name', 'create_trick_form[video'+video+']')
+    newInput.setAttribute('id', 'video'+video)
+    newInput.setAttribute('placeholder', 'https://youtu.be/abcdefghijkl or empty')
+    newInput.classList.add('form-control', 'mt-2')
+    target.append(newInput)
+    video++
+    document.querySelector('#videos').value = video
+})
+{% endblock %}
