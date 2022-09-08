@@ -42,8 +42,9 @@
 				<div class="modal-body">
 					<p>Are you sure to delete this trick ?</p>
 				</div>
+				<input type="hidden" id="trickSlug" value="" /> 
 				<div class="modal-footer">
-					<button type="button" class="btn btn-danger">Delete</button>
+					<button type="button" class="btn btn-danger" onclick="document.location= document.querySelector('#trickSlug').value">Delete</button>
 					<button type="button" class="btn btn-dark" data-dismiss="modal">Cancel</button>
 				</div>
 			</div>
@@ -54,30 +55,30 @@
 
 {% block JS %}
 	let offset = 0
-					async function listTricks() {
-						document.querySelector('.load').classList.add('d-none')
-						document.querySelector('.loader').classList.remove('d-none')
-						let response = await fetch('{{ path('app_list_tricks') }}/'+offset)
-						let data = await response.text()
-						if (data == '') {
-							document.querySelector('.loader').classList.add('d-none')
-							return
-						}
+	async function listTricks() {
+		document.querySelector('.load').classList.add('d-none')
+		document.querySelector('.loader').classList.remove('d-none')
+		let response = await fetch('{{ path('app_list_tricks') }}/'+offset)
+		let data = await response.text()
+		if (data == '') {
+			document.querySelector('.loader').classList.add('d-none')
+			return
+		}
 													
-						document.querySelector('.tricks').innerHTML+= data
-						offset+=5 
-						document.querySelector('.loader').classList.add('d-none')
-						document.querySelector('.load').classList.remove('d-none')
-					}
-					listTricks()
-					document.querySelector('.load').addEventListener('click', ()=>{listTricks()})
+		document.querySelector('.tricks').innerHTML+= data
+		offset+=5 
+		document.querySelector('.loader').classList.add('d-none')
+		document.querySelector('.load').classList.remove('d-none')
+	}
+	listTricks()
+	document.querySelector('.load').addEventListener('click', ()=>{listTricks()})
 
-					{% if app.user and app.user.isConfirmed == 1 %}								
-					function warningDelete(id = false) {
-						console.log(id)
-						if (id) {
-							$('#warningDelete').modal()
-						}
-					}
-					{% endif %}
+	{% if app.user and app.user.isConfirmed == 1 %}								
+		function warningDelete(slug = false) {
+			if (slug) {
+				document.querySelector('#trickSlug').value = 'deleteTrick/'+slug
+				$('#warningDelete').modal()
+			}
+		}
+	{% endif %}
 {% endblock %}

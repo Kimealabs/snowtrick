@@ -40,7 +40,7 @@ class Trick
     #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Video::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $videos;
 
-    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Post::class)]
+    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Post::class, cascade: ['remove'])]
     private Collection $posts;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'tricks')]
@@ -78,10 +78,8 @@ class Trick
     #[ORM\PreUpdate]
     public function makeSlug()
     {
-        if (empty($this->slug)) {
-            $slugify = new AsciiSlugger();
-            $this->slug = $slugify->slug($this->name);
-        }
+        $slugify = new AsciiSlugger();
+        $this->slug = $slugify->slug($this->name);
     }
 
     public function getSlug(): ?string

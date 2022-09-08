@@ -88,7 +88,24 @@ a.text-pink, .text-pink {
     }
 }
 
+.img-trick {
+    max-height:600px;
+    object-fit: cover;
+}
+.img-thumbnail-trick {
+    height:100px;
+    width:170px;
+    object-fit: cover;
+}
+
 @media screen and (max-width: 640px) {
+    .img-trick {
+        max-height: 350px;
+    }
+    .img-thumbnail-trick {
+        height:300px;
+        width:100%;
+    }
     .home {
         background-position: 60% 60%;
      }

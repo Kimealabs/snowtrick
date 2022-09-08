@@ -14,7 +14,7 @@
 			{% if app.user and app.user.isConfirmed == 1 %}
 				<div class="d-flex gap-3">
 					<i class="fa-solid link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
-					<i class="fa-solid link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
+					<i class="fa-solid link fa-trash-can" onclick="warningDelete('{{ trick.slug }}')"></i>
 				</div>
 			{% endif %}
 		</div>

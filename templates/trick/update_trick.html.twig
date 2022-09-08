@@ -6,20 +6,19 @@
 {% block body %}
 	<div class="container rounded p-4 shadow-lg" style="margin-top:100px;max-width:1000px;min-height:70vh">
 		<div class="row justify-content-center">
-   			<h1 class="h3 mb-3 font-weight-normal text-center mb-5">Update Trick</h1>
 
             <div class="text-center" style="position:relative;">
 			{% if trick.images[0].name is defined %}
 				{% for image in trick.images %}
 					{% if image.type == 'spotlight' %}
-						<img src="{{ asset('upload/tricks/'~image.name)}}" class="shadow rounded img-fluid w-100"/>
+						<img src="{{ asset('upload/tricks/'~image.name)}}" class="shadow rounded img-fluid w-100 img-trick"/>
 					{% endif %}
 				{% endfor %}
 			{% else %}
-				<img src="{{ asset('upload/assets/img/noimg.jpg')}}" class="shadow rounded img-fluid w-100"/>
+				<img src="{{ asset('upload/assets/img/noimg.jpg')}}" class="shadow rounded img-fluid w-100 img-trick"/>
 			{% endif %}
 			    <p class="text-pink text-center display-2" style="mix-blend-mode: hard-light;position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">{{trick.name}}</p>
-				<div class="d-flex gap-4 p-3 rounded bg-white shadow" style="position:absolute;right:15px;top:15px;">
+				<div class="d-flex gap-4 p-3 rounded bg-white shadow" style="position:absolute;right:25px;top:15px;">
 					<i class="fa-solid link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
 					<i class="fa-solid link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
 				</div>
@@ -35,11 +34,11 @@
 				{% for image in trick.images %}
                 <div>
 					<a href="{{ asset('upload/tricks/'~image.name)}}" data-lity>
-						<img src="{{ asset('upload/tricks/'~image.name)}}" class="w-100 rounded img-responsive" style="object-fit: cover;height:150px;"/>
+						<img src="{{ asset('upload/tricks/'~image.name)}}" class="rounded img-responsive img-thumbnail-trick" />
 					</a>
                     <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow">
-					    <i class="fa-solid fs-3 link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
-					    <i class="fa-solid fs-3 link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
+					    <i class="fa-solid fs-4 link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
+					    <i class="fa-solid fs-4 link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
 				    </div>
                 </div>
 				{% endfor %}
@@ -49,12 +48,12 @@
 				{% for video in trick.videos %}
                 <div>
 					<a href="https://www.youtube.com/watch?v={{ video.embed}}" data-lity style="position: relative">
-						<img src="https://img.youtube.com/vi/{{ video.embed}}/0.jpg" data-lity class="w-100 rounded img-responsive" style="object-fit: cover;height:150px;position:relative"/>
+						<img src="https://img.youtube.com/vi/{{ video.embed}}/0.jpg" data-lity class="rounded img-responsive img-thumbnail-trick" />
 						<i class="fa-2x fa-brands fa-youtube text-danger bg-white rounded p-0" style="position: absolute;top:0%;left:35%"></i>
 					</a>
                     <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow">
-					    <i class="fa-solid fs-3 link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
-					    <i class="fa-solid fs-3 link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
+					    <i class="fa-solid fs-4 link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
+					    <i class="fa-solid fs-4 link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
 				    </div>
 
                 </div>
@@ -77,8 +76,10 @@
             <input type="hidden" name="create_trick_form[videos]" value=0 id="videos" />
             <div class="youtube d-flex flex-column">
             </div>
-    		<button type="submit" class="btn btn-danger mt-5">Delete</button>
-            <button type="submit" class="btn btn-dark mt-5">Save</button>
+            <div class="d-flex gap-3 mt-5 justify-content-end">
+                <button class="btn btn-danger mt-5" onclick="document.location='{{ path('app_delete_trick', {'slug':trick.slug}) }}'">Delete</button>
+                <button type="submit" class="btn btn-dark mt-5">Save</button>
+            </div>
 	    	{{ form_end(form) }}
 		</div>
 	</div>

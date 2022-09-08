@@ -11,6 +11,7 @@ use App\Form\CreateTrickFormType;
 use App\Repository\PostRepository;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -129,13 +130,12 @@ class TrickController extends AbstractController
         $form = $this->createForm(CreateTrickFormType::class, $trick);
         $form->handleRequest($request);
         if ($form->isSubmitted() and $form->isValid()) {
-
-            if ($trickExist = $trickRepository->findBy(['slug' => $trick->getName()])) {
-                if ($trickExist[0]->getId() != $trick->getId()) {
-                    $this->addFlash('danger', 'Trick name exist yet !');
-                    return $this->redirectToRoute('app_update_trick');
-                }
+            $trickExist = $trickRepository->findOneBy(['slug' => $trick->getSlug()]);
+            if ($trickExist and $trick !== $trickExist) {
+                $this->addFlash('danger', 'Trick name exist yet !');
+                return $this->generateUrl('app_update_trick', ['slug' => $trick->getSlug()]);
             }
+
 
             $trick->setModifiedAt(new \DateTimeImmutable('now'));
 
@@ -194,6 +194,25 @@ class TrickController extends AbstractController
             'form' => $form->createView(),
             'trick' =>  $trick
         ]);
+    }
+
+    #[Route('/deleteTrick/{slug}', name: 'app_delete_trick')]
+    public function deleteTrick(string $slug, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
+    {
+        if ($user = $this->getUser()) {
+            if ($user->isConfirmed() == true) {
+                $trick = $trickRepository->findOneBy(['slug' => $slug]);
+                $images = $trick->getImages();
+                $fileSystem = new Filesystem();
+                foreach ($images as $image) {
+                    $fileSystem->remove($this->getParameter('upload_tricks_directory') . '/' . $image->getName());
+                }
+                $entityManagerInterface->remove($trick);
+                $entityManagerInterface->flush();
+                $this->addFlash('success', 'Trick Deleted !');
+                return $this->redirectToRoute('app_home');
+            }
+        }
     }
 
     #[Route('/listTricks/{offset<\d+>?0}', name: 'app_list_tricks')]
