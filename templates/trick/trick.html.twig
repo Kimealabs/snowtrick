@@ -14,7 +14,7 @@
 					{% endif %}
 				{% endfor %}
 			{% else %}
-				<img src="{{ asset('upload/assets/img/noimg.jpg')}}" class="shadow rounded img-fluid w-100 img-trick"/>
+				<img src="{{ asset('assets/img/noimg.jpg')}}" class="shadow rounded img-fluid w-100 img-trick"/>
 			{% endif %}
 			<p class="text-pink text-center display-2" style="mix-blend-mode: hard-light;position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">{{trick.name}}</p>
 			{% if app.user and app.user.isConfirmed == 1 %}
