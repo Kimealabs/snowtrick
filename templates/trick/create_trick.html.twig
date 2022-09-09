@@ -19,7 +19,6 @@
                     <label class="form-label">Add Youtube share links</label>
                     <i class="text-success fa-3x fa-solid fa-square-plus"></i>
                 </div>
-                <input type="hidden" name="create_trick_form[videos]" value=0 id="videos" />
                 <div class="youtube d-flex flex-column">
                 </div>
 				<button type="submit" class="btn btn-dark mt-5">CREATE</button>
@@ -35,12 +34,11 @@ let video = 0
 document.querySelector('.fa-square-plus').addEventListener('click', ()=> {
     let target = document.querySelector('.youtube')
     let newInput = document.createElement('input')
-    newInput.setAttribute('name', 'create_trick_form[video'+video+']')
+    newInput.setAttribute('name', 'create_trick_form[video][]')
     newInput.setAttribute('id', 'video'+video)
     newInput.setAttribute('placeholder', 'https://youtu.be/abcdefghijkl or empty')
     newInput.classList.add('form-control', 'mt-2')
     target.append(newInput)
     video++
-    document.querySelector('#videos').value = video
 })
 {% endblock %}

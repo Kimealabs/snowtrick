@@ -8,8 +8,10 @@ use App\Entity\Trick;
 use App\Entity\Video;
 use App\Form\PostFormType;
 use App\Form\CreateTrickFormType;
+use App\Repository\ImageRepository;
 use App\Repository\PostRepository;
 use App\Repository\TrickRepository;
+use App\Repository\VideoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,6 +39,8 @@ class TrickController extends AbstractController
         $form = $this->createForm(PostFormType::class, $post);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+
             $post->setCreatedAt(new \DateTimeImmutable('NOW'));
             $post->setTrick($trick);
             $post->setUserId($this->getUser());
@@ -56,6 +60,8 @@ class TrickController extends AbstractController
     #[Route('/create', name: 'app_create_trick')]
     public function createTrick(Request $request, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
     {
+        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+
         $trick = new Trick;
         $user = $this->getUser();
         $form = $this->createForm(CreateTrickFormType::class, $trick);
@@ -63,9 +69,10 @@ class TrickController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            if ($trickRepository->findBy(['slug' => $trick->getName()])) {
+            $trickExist = $trickRepository->findOneBy(['slug' => $trick->getSlug()]);
+            if ($trickExist and $trick !== $trickExist) {
                 $this->addFlash('danger', 'Trick name exist yet !');
-                return $this->redirectToRoute('app_create_trick');
+                return $this->generateUrl('app_update_trick', ['slug' => $trick->getSlug()]);
             }
 
             $trick->setCreatedAt(new \DateTimeImmutable('NOW'));
@@ -76,9 +83,9 @@ class TrickController extends AbstractController
                 $spotlightName = md5(uniqid()) . '.' . $spotlight->guessExtension();
                 $spotlight->move($this->getParameter('upload_tricks_directory'), $spotlightName);
                 $newImage = new Image;
-                $newImage->setName($spotlightName);
-                $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
-                $newImage->setType('spotlight');
+                $newImage->setName($spotlightName)
+                    ->setCreatedAt(new \DateTimeImmutable(('NOW')))
+                    ->setType('spotlight');
                 $trick->addImage(($newImage));
             }
 
@@ -92,21 +99,20 @@ class TrickController extends AbstractController
                         $spotlight = true;
                         $newImage->setType('spotlight');
                     }
-                    $newImage->setName($imageName);
-                    $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                    $newImage->setName($imageName)
+                        ->setCreatedAt(new \DateTimeImmutable(('NOW')));
                     $trick->addImage(($newImage));
                 }
             }
 
-            $videos = $form->getExtraData();
-            for ($i = 0; $i < $videos["videos"]; $i++) {
-                $youtubeCode = $videos["video" . $i];
-                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $youtubeCode, $match);
+            $extraForm = $form->getExtraData();
+            foreach ($extraForm["video"] as $video) {
+                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $video, $match);
                 if (isset($match[1])) {
                     $youtubeCode = $match[1];
                     $newVideo = new Video;
-                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')));
-                    $newVideo->setEmbed($youtubeCode);
+                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')))
+                        ->setEmbed($youtubeCode);
                     $trick->addVideo(($newVideo));
                 }
             }
@@ -124,12 +130,22 @@ class TrickController extends AbstractController
     }
 
     #[Route('/update/{slug}', name: 'app_update_trick')]
-    public function updateTrick(Request $request, Trick $trick, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
-    {
+    public function updateTrick(
+        Request $request,
+        Trick $trick,
+        TrickRepository $trickRepository,
+        ImageRepository $imageRepository,
+        VideoRepository $videoRepository,
+        EntityManagerInterface $entityManagerInterface
+    ): Response {
+        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+
         $user = $this->getUser();
         $form = $this->createForm(CreateTrickFormType::class, $trick);
         $form->handleRequest($request);
+
         if ($form->isSubmitted() and $form->isValid()) {
+
             $trickExist = $trickRepository->findOneBy(['slug' => $trick->getSlug()]);
             if ($trickExist and $trick !== $trickExist) {
                 $this->addFlash('danger', 'Trick name exist yet !');
@@ -138,7 +154,6 @@ class TrickController extends AbstractController
 
 
             $trick->setModifiedAt(new \DateTimeImmutable('now'));
-
             $trick->setUserId($user);
 
             $spotlight = $form->get('spotlight')->getData();
@@ -171,16 +186,33 @@ class TrickController extends AbstractController
                 }
             }
 
-            $videos = $form->getExtraData();
-            for ($i = 0; $i < $videos["videos"]; $i++) {
-                $youtubeCode = $videos["video" . $i];
-                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $youtubeCode, $match);
-                if (isset($match[1])) {
-                    $youtubeCode = $match[1];
-                    $newVideo = new Video;
-                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')));
-                    $newVideo->setEmbed($youtubeCode);
-                    $trick->addVideo(($newVideo));
+            $extraForm = $form->getExtraData();
+            if (isset($extraForm["video"])) {
+                foreach ($extraForm["video"] as $video) {
+                    preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $video, $match);
+                    if (isset($match[1])) {
+                        $youtubeCode = $match[1];
+                        $newVideo = new Video;
+                        $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')))
+                            ->setEmbed($youtubeCode);
+                        $trick->addVideo(($newVideo));
+                    }
+                }
+            }
+
+            if (isset($extraForm["imageToDelete"])) {
+                foreach ($extraForm["imageToDelete"] as $imageToDelete) {
+                    $imgTarget = $imageRepository->find($imageToDelete);
+                    $entityManagerInterface->remove($imgTarget);
+                    $fileSystem = new Filesystem();
+                    $fileSystem->remove($this->getParameter('upload_tricks_directory') . '/' . $imgTarget->getName());
+                }
+            }
+
+            if (isset($extraForm["videoToDelete"])) {
+                foreach ($extraForm["videoToDelete"] as $videoToDelete) {
+                    $videoTarget = $videoRepository->find($videoToDelete);
+                    $entityManagerInterface->remove($videoTarget);
                 }
             }
 
@@ -199,6 +231,8 @@ class TrickController extends AbstractController
     #[Route('/deleteTrick/{slug}', name: 'app_delete_trick')]
     public function deleteTrick(string $slug, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
     {
+        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+
         if ($user = $this->getUser()) {
             if ($user->isConfirmed() == true) {
                 $trick = $trickRepository->findOneBy(['slug' => $slug]);

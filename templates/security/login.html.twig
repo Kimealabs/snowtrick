@@ -10,9 +10,9 @@
 
 			{% if app.user %}
 				<div class="mb-3">
-					Vous êtes connecté comme
+					Your are logged as 
 					<b>{{ app.user.userIdentifier }}</b>,
-					<a href="{{ path('app_logout') }}">Déconnexion</a>
+					<a href="{{ path('app_logout') }}">Logout</a>
 				</div>
 			{% else %}
 				<div class="row justify-content-center">

@@ -22,10 +22,6 @@ class SecurityController extends AbstractController
     #[Route(path: '/signin', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // if ($this->getUser()) {
-        //     return $this->redirectToRoute('target_path');
-        // }
-
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
@@ -37,6 +33,8 @@ class SecurityController extends AbstractController
     #[Route(path: '/forgottenPassword', name: 'app_forgotten_password')]
     public function forgottenPassword(Request $request, UserTools $userTools, UserRepository $userRepo): Response
     {
+        $this->denyAccessUnlessGranted('connected', $this->getUser());
+
         $form = $this->createForm(ForgottenPasswordFormType::class);
         $form->handleRequest($request);
         $message = '';
@@ -97,6 +95,8 @@ class SecurityController extends AbstractController
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
+        $this->denyAccessUnlessGranted('connected', $this->getUser());
+
         $this->addFlash(
             'success',
             'Great, You are disconnected !'
