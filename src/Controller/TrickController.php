@@ -104,9 +104,8 @@ class TrickController extends AbstractController
             }
 
             $videos = $form->getExtraData();
-            for ($i = 0; $i < $videos["videos"]; $i++) {
-                $youtubeCode = $videos["video" . $i];
-                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $youtubeCode, $match);
+            foreach ($videos["video"] as $video) {
+                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $video, $match);
                 if (isset($match[1])) {
                     $youtubeCode = $match[1];
                     $newVideo = new Video;
@@ -180,14 +179,13 @@ class TrickController extends AbstractController
             }
 
             $videos = $form->getExtraData();
-            for ($i = 0; $i < $videos["videos"]; $i++) {
-                $youtubeCode = $videos["video" . $i];
-                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $youtubeCode, $match);
+            foreach ($videos["video"] as $video) {
+                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $video, $match);
                 if (isset($match[1])) {
                     $youtubeCode = $match[1];
                     $newVideo = new Video;
-                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')));
-                    $newVideo->setEmbed($youtubeCode);
+                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')))
+                        ->setEmbed($youtubeCode);
                     $trick->addVideo(($newVideo));
                 }
             }

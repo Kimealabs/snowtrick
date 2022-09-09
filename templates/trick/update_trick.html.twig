@@ -33,9 +33,10 @@
 						<img src="{{ asset('upload/tricks/'~image.name)}}" class="rounded img-responsive img-thumbnail-trick" />
 					</a>
                     <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow">
-					    <i class="fa-solid fs-4 link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
+					    <i class="fa-solid fs-4 link fa-trash-can"></i>
 				    </div>
                 </div>
+				<input type="hidden" name="imageToDelete" value="{{ image.id }}" />
 				{% endfor %}
 			{% endif %}
 
@@ -47,9 +48,8 @@
 						<i class="fa-2x fa-brands fa-youtube text-danger bg-white rounded p-0" style="position: absolute;top:0%;left:35%"></i>
 					</a>
                     <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow">
-					    <i class="fa-solid fs-4 link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
+					    <i class="fa-solid fs-4 link fa-trash-can"></i>
 				    </div>
-
                 </div>
 				{% endfor %}
 			{% endif %}
@@ -70,6 +70,12 @@
             <input type="hidden" name="create_trick_form[videos]" value=0 id="videos" />
             <div class="youtube d-flex flex-column">
             </div>
+			{% for image in trick.images %}
+				<input type="hidden" name="imageToDelete[]" value="{{ image.id }}" />
+			{% endfor %}
+			{% for video in trick.videos %}
+				<input type="hidden" name="videoToDelete[]" value="{{ video.id }}" />
+			{% endfor %}
             <div class="d-flex gap-3 mt-5 justify-content-end">
                 <button class="btn btn-danger mt-5" onclick="document.location='{{ path('app_delete_trick', {'slug':trick.slug}) }}'">Delete</button>
                 <button type="submit" class="btn btn-dark mt-5">Save</button>
