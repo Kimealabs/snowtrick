@@ -33,6 +33,8 @@ class SecurityController extends AbstractController
     #[Route(path: '/forgottenPassword', name: 'app_forgotten_password')]
     public function forgottenPassword(Request $request, UserTools $userTools, UserRepository $userRepo): Response
     {
+        $this->denyAccessUnlessGranted('connected', $this->getUser());
+
         $form = $this->createForm(ForgottenPasswordFormType::class);
         $form->handleRequest($request);
         $message = '';
@@ -93,6 +95,8 @@ class SecurityController extends AbstractController
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
+        $this->denyAccessUnlessGranted('connected', $this->getUser());
+
         $this->addFlash(
             'success',
             'Great, You are disconnected !'

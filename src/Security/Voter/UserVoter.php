@@ -2,7 +2,6 @@
 
 namespace App\Security\Voter;
 
-use App\Repository\UserRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -39,14 +38,12 @@ class UserVoter extends Voter
                 break;
             case self::ONLY_CONNECTED_NOT_CONFIRMED:
                 if ($user instanceof UserInterface) {
-                    $userEntity = $userRepository->find($user->getUserIdentifier());
-                    if (!$userEntity->isConfirmed()) return true;
+                    if (!$user->isConfirmed()) return true;
                 }
                 break;
             case self::ONLY_CONNECTED_CONFIRMED:
                 if ($user instanceof UserInterface) {
-                    $userEntity = $userRepository->find($user->getUserIdentifier());
-                    if ($userEntity->isConfirmed()) return true;
+                    if ($user->isConfirmed()) return true;
                 }
                 break;
         }
