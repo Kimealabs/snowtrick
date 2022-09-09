@@ -15,7 +15,7 @@
 					{% endif %}
 				{% endfor %}
 			{% else %}
-				<img src="{{ asset('upload/assets/img/noimg.jpg')}}" class="shadow rounded img-fluid w-100 img-trick"/>
+				<img src="{{ asset('assets/img/noimg.jpg')}}" class="shadow rounded img-fluid w-100 img-trick"/>
 			{% endif %}
 			    <p class="text-pink text-center display-2" style="mix-blend-mode: hard-light;position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">{{trick.name}}</p>
 		</div>
@@ -30,13 +30,12 @@
 				{% for image in trick.images %}
                 <div>
 					<a href="{{ asset('upload/tricks/'~image.name)}}" data-lity>
-						<img src="{{ asset('upload/tricks/'~image.name)}}" class="rounded img-responsive img-thumbnail-trick" />
+						<img src="{{ asset('upload/tricks/'~image.name)}}" id="i{{ image.id }}" class="rounded img-responsive img-thumbnail-trick" />
 					</a>
-                    <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow">
-					    <i class="fa-solid fs-4 link fa-trash-can"></i>
+                    <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow" id="trash_i{{ image.id }}">
+					    <i class="fa-solid fs-4 link fa-trash-can" onclick="deleteZone('image', {{ image.id }} )"></i>
 				    </div>
                 </div>
-				<input type="hidden" name="imageToDelete" value="{{ image.id }}" />
 				{% endfor %}
 			{% endif %}
 
@@ -44,11 +43,11 @@
 				{% for video in trick.videos %}
                 <div>
 					<a href="https://www.youtube.com/watch?v={{ video.embed}}" data-lity style="position: relative">
-						<img src="https://img.youtube.com/vi/{{ video.embed}}/0.jpg" data-lity class="rounded img-responsive img-thumbnail-trick" />
-						<i class="fa-2x fa-brands fa-youtube text-danger bg-white rounded p-0" style="position: absolute;top:0%;left:35%"></i>
+						<img src="https://img.youtube.com/vi/{{ video.embed}}/0.jpg"  id="v{{ video.id }}" data-lity class="rounded img-responsive img-thumbnail-trick" />
+						<i class="fa-2x fa-brands fa-youtube text-danger bg-white rounded p-0"  id="icon_v{{ video.id }}" style="position: absolute;top:0%;left:35%"></i>
 					</a>
-                    <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow">
-					    <i class="fa-solid fs-4 link fa-trash-can"></i>
+                    <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow" id="trash_v{{ video.id }}">
+					    <i class="fa-solid fs-4 link fa-trash-can" onclick="deleteZone('video', {{ video.id }} )"></i>
 				    </div>
                 </div>
 				{% endfor %}
@@ -67,15 +66,9 @@
                 <label class="form-label">Add Youtube share links</label>
                 <i class="text-success fa-3x fa-solid fa-square-plus"></i>
             </div>
-            <input type="hidden" name="create_trick_form[videos]" value=0 id="videos" />
             <div class="youtube d-flex flex-column">
             </div>
-			{% for image in trick.images %}
-				<input type="hidden" name="imageToDelete[]" value="{{ image.id }}" />
-			{% endfor %}
-			{% for video in trick.videos %}
-				<input type="hidden" name="videoToDelete[]" value="{{ video.id }}" />
-			{% endfor %}
+			<div id="deleteZone"></div>
             <div class="d-flex gap-3 mt-5 justify-content-end">
                 <button class="btn btn-danger mt-5" onclick="document.location='{{ path('app_delete_trick', {'slug':trick.slug}) }}'">Delete</button>
                 <button type="submit" class="btn btn-dark mt-5">Save</button>
@@ -91,12 +84,26 @@ let video = 0
 document.querySelector('.fa-square-plus').addEventListener('click', ()=> {
     let target = document.querySelector('.youtube')
     let newInput = document.createElement('input')
-    newInput.setAttribute('name', 'create_trick_form[video'+video+']')
+    newInput.setAttribute('name', 'create_trick_form[video][]')
     newInput.setAttribute('id', 'video'+video)
     newInput.setAttribute('placeholder', 'https://youtu.be/abcdefghijkl or empty')
     newInput.classList.add('form-control', 'mt-2')
     target.append(newInput)
     video++
-    document.querySelector('#videos').value = video
 })
+
+function deleteZone(type, id) {
+	let deleteDiv = document.querySelector('#deleteZone')
+	if (type == 'image') {
+		deleteDiv.innerHTML+= `<input type="hidden" name="create_trick_form[imageToDelete][]" value=${id}" />`
+		document.querySelector('#i'+id).src = "{{ asset('assets/img/deleted.jpg') }}"
+		document.querySelector('#trash_i'+id).remove()
+	}
+	else {
+		deleteDiv.innerHTML+= `<input type="hidden" name="create_trick_form[videoToDelete][]" value=${id}" />`
+		document.querySelector('#v'+id).src = "{{ asset('assets/img/deleted.jpg') }}"
+		document.querySelector('#trash_v'+id).remove()
+		document.querySelector('#icon_v'+id).remove()
+	}
+}
 {% endblock %}

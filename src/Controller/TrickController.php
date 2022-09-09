@@ -8,8 +8,10 @@ use App\Entity\Trick;
 use App\Entity\Video;
 use App\Form\PostFormType;
 use App\Form\CreateTrickFormType;
+use App\Repository\ImageRepository;
 use App\Repository\PostRepository;
 use App\Repository\TrickRepository;
+use App\Repository\VideoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -103,8 +105,8 @@ class TrickController extends AbstractController
                 }
             }
 
-            $videos = $form->getExtraData();
-            foreach ($videos["video"] as $video) {
+            $extraForm = $form->getExtraData();
+            foreach ($extraForm["video"] as $video) {
                 preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $video, $match);
                 if (isset($match[1])) {
                     $youtubeCode = $match[1];
@@ -128,8 +130,14 @@ class TrickController extends AbstractController
     }
 
     #[Route('/update/{slug}', name: 'app_update_trick')]
-    public function updateTrick(Request $request, Trick $trick, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
-    {
+    public function updateTrick(
+        Request $request,
+        Trick $trick,
+        TrickRepository $trickRepository,
+        ImageRepository $imageRepository,
+        VideoRepository $videoRepository,
+        EntityManagerInterface $entityManagerInterface
+    ): Response {
         $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
 
         $user = $this->getUser();
@@ -178,15 +186,33 @@ class TrickController extends AbstractController
                 }
             }
 
-            $videos = $form->getExtraData();
-            foreach ($videos["video"] as $video) {
-                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $video, $match);
-                if (isset($match[1])) {
-                    $youtubeCode = $match[1];
-                    $newVideo = new Video;
-                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')))
-                        ->setEmbed($youtubeCode);
-                    $trick->addVideo(($newVideo));
+            $extraForm = $form->getExtraData();
+            if (isset($extraForm["video"])) {
+                foreach ($extraForm["video"] as $video) {
+                    preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $video, $match);
+                    if (isset($match[1])) {
+                        $youtubeCode = $match[1];
+                        $newVideo = new Video;
+                        $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')))
+                            ->setEmbed($youtubeCode);
+                        $trick->addVideo(($newVideo));
+                    }
+                }
+            }
+
+            if (isset($extraForm["imageToDelete"])) {
+                foreach ($extraForm["imageToDelete"] as $imageToDelete) {
+                    $imgTarget = $imageRepository->find($imageToDelete);
+                    $entityManagerInterface->remove($imgTarget);
+                    $fileSystem = new Filesystem();
+                    $fileSystem->remove($this->getParameter('upload_tricks_directory') . '/' . $imgTarget->getName());
+                }
+            }
+
+            if (isset($extraForm["videoToDelete"])) {
+                foreach ($extraForm["videoToDelete"] as $videoToDelete) {
+                    $videoTarget = $videoRepository->find($videoToDelete);
+                    $entityManagerInterface->remove($videoTarget);
                 }
             }
 
