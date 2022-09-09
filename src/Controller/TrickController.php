@@ -63,9 +63,10 @@ class TrickController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
-            if ($trickRepository->findBy(['slug' => $trick->getName()])) {
+            $trickExist = $trickRepository->findOneBy(['slug' => $trick->getSlug()]);
+            if ($trickExist and $trick !== $trickExist) {
                 $this->addFlash('danger', 'Trick name exist yet !');
-                return $this->redirectToRoute('app_create_trick');
+                return $this->generateUrl('app_update_trick', ['slug' => $trick->getSlug()]);
             }
 
             $trick->setCreatedAt(new \DateTimeImmutable('NOW'));
@@ -76,9 +77,9 @@ class TrickController extends AbstractController
                 $spotlightName = md5(uniqid()) . '.' . $spotlight->guessExtension();
                 $spotlight->move($this->getParameter('upload_tricks_directory'), $spotlightName);
                 $newImage = new Image;
-                $newImage->setName($spotlightName);
-                $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
-                $newImage->setType('spotlight');
+                $newImage->setName($spotlightName)
+                    ->setCreatedAt(new \DateTimeImmutable(('NOW')))
+                    ->setType('spotlight');
                 $trick->addImage(($newImage));
             }
 
@@ -92,8 +93,8 @@ class TrickController extends AbstractController
                         $spotlight = true;
                         $newImage->setType('spotlight');
                     }
-                    $newImage->setName($imageName);
-                    $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                    $newImage->setName($imageName)
+                        ->setCreatedAt(new \DateTimeImmutable(('NOW')));
                     $trick->addImage(($newImage));
                 }
             }
@@ -105,8 +106,8 @@ class TrickController extends AbstractController
                 if (isset($match[1])) {
                     $youtubeCode = $match[1];
                     $newVideo = new Video;
-                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')));
-                    $newVideo->setEmbed($youtubeCode);
+                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')))
+                        ->setEmbed($youtubeCode);
                     $trick->addVideo(($newVideo));
                 }
             }
@@ -129,7 +130,9 @@ class TrickController extends AbstractController
         $user = $this->getUser();
         $form = $this->createForm(CreateTrickFormType::class, $trick);
         $form->handleRequest($request);
+
         if ($form->isSubmitted() and $form->isValid()) {
+
             $trickExist = $trickRepository->findOneBy(['slug' => $trick->getSlug()]);
             if ($trickExist and $trick !== $trickExist) {
                 $this->addFlash('danger', 'Trick name exist yet !');
@@ -138,7 +141,6 @@ class TrickController extends AbstractController
 
 
             $trick->setModifiedAt(new \DateTimeImmutable('now'));
-
             $trick->setUserId($user);
 
             $spotlight = $form->get('spotlight')->getData();

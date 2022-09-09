@@ -3,12 +3,15 @@
 namespace App\Form;;
 
 use App\Entity\Category;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\All;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class CreateTrickFormType extends AbstractType
@@ -45,6 +48,9 @@ class CreateTrickFormType extends AbstractType
                 'expanded' => true,
                 'attr' => [
                     'class' => 'form-control'
+                ],
+                'constraints' => [
+                    new Count(['min' => 1, 'minMessage' => 'At least one category is required'])
                 ]
             ])
             ->add(
@@ -57,6 +63,15 @@ class CreateTrickFormType extends AbstractType
                     'required' => false,
                     'attr' => [
                         'class' => 'form-control'
+                    ],
+                    'constraints' => [
+                        new File([
+                            'maxSize' => '5M',
+                            'mimeTypes' => [
+                                'image/*'
+                            ],
+                            'mimeTypesMessage' => 'Your file is not an Image format !',
+                        ]),
                     ]
                 ]
             )
@@ -70,6 +85,18 @@ class CreateTrickFormType extends AbstractType
                     'required' => false,
                     'attr' => [
                         'class' => 'form-control'
+                    ],
+                    'constraints' => [
+                        new Count(['max' => 6, 'maxMessage' => 'You can upload 6 files max !']),
+                        new All([
+                            new File([
+                                'maxSize' => '5M',
+                                'mimeTypes' => [
+                                    'image/*'
+                                ],
+                                'mimeTypesMessage' => 'File format must be an Image !',
+                            ])
+                        ])
                     ]
                 ]
             );
