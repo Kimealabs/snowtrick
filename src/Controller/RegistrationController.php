@@ -26,6 +26,8 @@ class RegistrationController extends AbstractController
         UserAuthenticatorInterface $authenticator,
         UserAuthenticator $formAuthenticator
     ): Response {
+        $this->denyAccessUnlessGranted('only_not_connected', $this->getUser());
+
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
@@ -56,6 +58,7 @@ class RegistrationController extends AbstractController
     #[Route('/registerValidate', name: 'app_register_validate')]
     public function validateRegisterUser()
     {
+        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
         return $this->render('registration/validate_user.html.twig', []);
     }
 
@@ -83,6 +86,7 @@ class RegistrationController extends AbstractController
     #[Route('/resendValidationAccount', name: 'app_resend_validation')]
     public function resendValidationRequest(UserTools $userTools)
     {
+        $this->denyAccessUnlessGranted('only_connected_not_confirmed', $this->getUser());
         if ($user = $this->getUser()) {
             if (!$user->isConfirmed()) {
                 $userTools->sendToken($user, 'Renvoi de vérification du compte', 'register');

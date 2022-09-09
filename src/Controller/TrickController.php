@@ -37,6 +37,8 @@ class TrickController extends AbstractController
         $form = $this->createForm(PostFormType::class, $post);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+
             $post->setCreatedAt(new \DateTimeImmutable('NOW'));
             $post->setTrick($trick);
             $post->setUserId($this->getUser());
@@ -56,6 +58,8 @@ class TrickController extends AbstractController
     #[Route('/create', name: 'app_create_trick')]
     public function createTrick(Request $request, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
     {
+        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+
         $trick = new Trick;
         $user = $this->getUser();
         $form = $this->createForm(CreateTrickFormType::class, $trick);
@@ -127,6 +131,8 @@ class TrickController extends AbstractController
     #[Route('/update/{slug}', name: 'app_update_trick')]
     public function updateTrick(Request $request, Trick $trick, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
     {
+        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+
         $user = $this->getUser();
         $form = $this->createForm(CreateTrickFormType::class, $trick);
         $form->handleRequest($request);
@@ -201,6 +207,8 @@ class TrickController extends AbstractController
     #[Route('/deleteTrick/{slug}', name: 'app_delete_trick')]
     public function deleteTrick(string $slug, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
     {
+        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+
         if ($user = $this->getUser()) {
             if ($user->isConfirmed() == true) {
                 $trick = $trickRepository->findOneBy(['slug' => $slug]);

@@ -18,10 +18,6 @@
 				<img src="{{ asset('upload/assets/img/noimg.jpg')}}" class="shadow rounded img-fluid w-100 img-trick"/>
 			{% endif %}
 			    <p class="text-pink text-center display-2" style="mix-blend-mode: hard-light;position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">{{trick.name}}</p>
-				<div class="d-flex gap-4 p-3 rounded bg-white shadow" style="position:absolute;right:25px;top:15px;">
-					<i class="fa-solid link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
-					<i class="fa-solid link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
-				</div>
 		</div>
 
         <div class="d-block d-sm-none mt-4 col-12 text-center">
@@ -37,7 +33,6 @@
 						<img src="{{ asset('upload/tricks/'~image.name)}}" class="rounded img-responsive img-thumbnail-trick" />
 					</a>
                     <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow">
-					    <i class="fa-solid fs-4 link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
 					    <i class="fa-solid fs-4 link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
 				    </div>
                 </div>
@@ -52,7 +47,6 @@
 						<i class="fa-2x fa-brands fa-youtube text-danger bg-white rounded p-0" style="position: absolute;top:0%;left:35%"></i>
 					</a>
                     <div class="d-flex gap-5 m-2 p-3 justify-content-center rounded bg-white shadow">
-					    <i class="fa-solid fs-4 link fa-pen-to-square" onclick="document.location='{{ path('app_update_trick', {'slug': trick.slug}) }}'"></i>
 					    <i class="fa-solid fs-4 link fa-trash-can" onclick="warningDelete({{ trick.id }})"></i>
 				    </div>
 
