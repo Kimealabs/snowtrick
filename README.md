@@ -119,7 +119,7 @@ Below is an example of how you can install on local with Docker.
 4. Run docker-compose up  (or use Make file -> make start for 4-5 | make install for 4-5-6-7-8)
 5. Run php bin/console server:start
 6. php bin/console database:create
-7. php bon/console doctrine:migrations:migrate
+7. php bin/console doctrine:migrations:migrate
 8. php bin/console doctrine:fixtures:load (add Categories, fictitious users and 10 examples of tricks into database)
 9. Change .env MAIL_DSN with your smtp system (if you don't want develop or use personal Email system)
 
