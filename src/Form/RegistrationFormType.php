@@ -22,29 +22,29 @@ class RegistrationFormType extends AbstractType
                 'attr' => [
                     'class' => 'form-control'
                 ],
-                'label' => 'Votre nom ou surnom'
+                'label' => 'Your name or nickname'
             ])
             ->add('email', EmailType::class, [
                 'attr' => [
                     'class' => 'form-control'
                 ],
-                'label' => 'Votre adresse email'
+                'label' => 'Your email address'
             ])
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Entrez un mot de passe',
+                        'message' => 'Choose password',
                     ]),
                     new Length([
                         'min' => 6,
-                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
+                        'minMessage' => 'Your password must contain at least {{ limit }} characters',
                         'max' => 12,
-                        'maxMessage' => 'Votre mot de passe doit contenir au maximum 12 caractères',
+                        'maxMessage' => 'Your password must contain a maximum of 12 characters',
                     ]),
                 ],
-                'label' => 'Votre mot de passe (entre 6 et 12 car.)'
+                'label' => 'Your password (between 6 and 12 char.)'
             ]);
     }
 

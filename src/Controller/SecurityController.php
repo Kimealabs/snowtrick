@@ -33,7 +33,7 @@ class SecurityController extends AbstractController
     #[Route(path: '/forgottenPassword', name: 'app_forgotten_password')]
     public function forgottenPassword(Request $request, UserTools $userTools, UserRepository $userRepo): Response
     {
-        $this->denyAccessUnlessGranted('connected', $this->getUser());
+        $this->denyAccessUnlessGranted('only_not_connected', $this->getUser());
 
         $form = $this->createForm(ForgottenPasswordFormType::class);
         $form->handleRequest($request);
