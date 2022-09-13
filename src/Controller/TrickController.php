@@ -23,16 +23,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class TrickController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(TrickRepository $tricks): Response
+    public function index(): Response
     {
-        $tricks = $tricks->findAll();
-        return $this->render('trick/home.html.twig', [
-            'tricks' => $tricks,
-        ]);
+        return $this->render('trick/home.html.twig');
     }
 
     #[Route('/trick/{slug}', name: 'app_trick')]
-    public function trick(Request $request, Trick $trick, PostRepository $postRepository, EntityManagerInterface $em): Response
+    public function trick(Request $request, Trick $trick, PostRepository $postRepository, EntityManagerInterface $entityManagerInterface): Response
     {
         $posts = $postRepository->findBy(['trick' => $trick->getId()], ['createdAt' => 'DESC']);
         $post = new Post();
@@ -44,8 +41,8 @@ class TrickController extends AbstractController
             $post->setCreatedAt(new \DateTimeImmutable('NOW'));
             $post->setTrick($trick);
             $post->setUserId($this->getUser());
-            $em->persist($post);
-            $em->flush($post);
+            $entityManagerInterface->persist($post);
+            $entityManagerInterface->flush($post);
             $this->addFlash('success', 'Your comment is published');
             $url = $this->generateUrl('app_trick', ['slug' => $trick->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
             return $this->redirect($url);
