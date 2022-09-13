@@ -13,6 +13,7 @@ class UserVoter extends Voter
     public const ONLY_CONNECTED_NOT_CONFIRMED = 'only_connected_not_confirmed';
     public const ONLY_CONNECTED_CONFIRMED = 'only_connected_confirmed';
 
+    // SEE AccessDeniedListener (EventSubscriberInterface) INTO SECURITY FOR PROFILES ACTIONS
 
     protected function supports(string $attribute, $subject): bool
     {
