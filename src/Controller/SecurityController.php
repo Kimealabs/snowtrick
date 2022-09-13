@@ -53,6 +53,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
+    // RESET PAGE AFTER LINK INTO EMAIL -> CONTROL USERNAME WITH FORM && JWT
     #[Route(path: '/resetPassword/{token}', name: 'app_reset_password')]
     public function resetPassword(Request $request, string $token, JWTService $jwt, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $em)
     {
