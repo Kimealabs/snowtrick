@@ -5,13 +5,13 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Entity\Image;
 use App\Entity\Trick;
-use App\Entity\Video;
 use App\Form\PostFormType;
 use App\Form\CreateTrickFormType;
 use App\Repository\ImageRepository;
 use App\Repository\PostRepository;
 use App\Repository\TrickRepository;
 use App\Repository\VideoRepository;
+use App\Service\Media\MediaService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,8 +58,12 @@ class TrickController extends AbstractController
     }
 
     #[Route('/create', name: 'app_create_trick')]
-    public function createTrick(Request $request, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
-    {
+    public function createTrick(
+        Request $request,
+        TrickRepository $trickRepository,
+        MediaService $mediaService,
+        EntityManagerInterface $entityManagerInterface
+    ): Response {
         $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
 
         $trick = new Trick;
@@ -69,6 +73,7 @@ class TrickController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
+            // IF TRICK NAME EXIST YET TEST
             $trickExist = $trickRepository->findOneBy(['slug' => $trick->getSlug()]);
             if ($trickExist and $trick !== $trickExist) {
                 $this->addFlash('danger', 'Trick name exist yet !');
@@ -78,42 +83,32 @@ class TrickController extends AbstractController
             $trick->setCreatedAt(new \DateTimeImmutable('NOW'));
             $trick->setUserId($user);
 
+            // ADD IMAGE TO DB (type 'spotlight') AND FILE FROM INPUT FILE
             $spotlight = $form->get('spotlight')->getData();
             if ($spotlight !== null) {
-                $spotlightName = md5(uniqid()) . '.' . $spotlight->guessExtension();
-                $spotlight->move($this->getParameter('upload_tricks_directory'), $spotlightName);
-                $newImage = new Image;
-                $newImage->setName($spotlightName)
-                    ->setCreatedAt(new \DateTimeImmutable(('NOW')))
-                    ->setType('spotlight');
+                $newImage = $mediaService->upload($spotlight);
+                $newImage->setType('spotlight');
                 $trick->addImage(($newImage));
             }
 
+            // ADD IMAGE TO DB AND FILES FROM INPUT FILES
             $images = $form->get('images')->getData();
             if ($images !== null) {
                 foreach ($images as $image) {
-                    $imageName = md5(uniqid()) . '.' . $image->guessExtension();
-                    $image->move($this->getParameter('upload_tricks_directory'), $imageName);
-                    $newImage = new Image;
+                    $newImage = $mediaService->upload($image);
                     if ($spotlight === null) {
                         $spotlight = true;
                         $newImage->setType('spotlight');
                     }
-                    $newImage->setName($imageName)
-                        ->setCreatedAt(new \DateTimeImmutable(('NOW')));
                     $trick->addImage(($newImage));
                 }
             }
 
+            // ADD VIDEO (filter Youtube) TO DB
             $extraForm = $form->getExtraData();
-            foreach ($extraForm["video"] as $video) {
-                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $video, $match);
-                if (isset($match[1])) {
-                    $youtubeCode = $match[1];
-                    $newVideo = new Video;
-                    $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')))
-                        ->setEmbed($youtubeCode);
-                    $trick->addVideo(($newVideo));
+            if (isset($extraForm["video"])) {
+                foreach ($extraForm["video"] as $video) {
+                    $trick = $mediaService->addVideo($trick, $video);
                 }
             }
 
@@ -136,6 +131,7 @@ class TrickController extends AbstractController
         TrickRepository $trickRepository,
         ImageRepository $imageRepository,
         VideoRepository $videoRepository,
+        MediaService $mediaService,
         EntityManagerInterface $entityManagerInterface
     ): Response {
         $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
@@ -146,76 +142,77 @@ class TrickController extends AbstractController
 
         if ($form->isSubmitted() and $form->isValid()) {
 
+            // IF TRICK NAME EXIST YET TEST
             $trickExist = $trickRepository->findOneBy(['slug' => $trick->getSlug()]);
             if ($trickExist and $trick !== $trickExist) {
                 $this->addFlash('danger', 'Trick name exist yet !');
                 return $this->generateUrl('app_update_trick', ['slug' => $trick->getSlug()]);
             }
 
-
             $trick->setModifiedAt(new \DateTimeImmutable('now'));
             $trick->setUserId($user);
 
-            $spotlight = $form->get('spotlight')->getData();
-            if ($spotlight !== null) {
-                $spotlightName = md5(uniqid()) . '.' . $spotlight->guessExtension();
-                $spotlight->move($this->getParameter('upload_tricks_directory'), $spotlightName);
-                $newImage = new Image;
-                $newImage->setName($spotlightName);
-                $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
-                $newImage->setType('spotlight');
-                $trick->addImage(($newImage));
+            // ADD VIDEO (filter Youtube) TO DB
+            $extraForm = $form->getExtraData();
+            if (isset($extraForm["video"])) {
+                foreach ($extraForm["video"] as $video) {
+                    $trick = $mediaService->addVideo($trick, $video);
+                }
             }
 
+            // REMOVE VIDEO TO DELETE BY INPUT HIDDEN ARRAY
+            if (isset($extraForm["videoToDelete"])) {
+                foreach ($extraForm["videoToDelete"] as $videoToDelete) {
+                    $videoTarget = $videoRepository->find($videoToDelete);
+                    $trick->removeVideo($videoTarget);
+                }
+            }
+
+            // REMOVE IMG TO DELETE FROM DB AND FILES BY INPUT HIDDEN ARRAY
+            if (isset($extraForm["imageToDelete"])) {
+                foreach ($extraForm["imageToDelete"] as $imageToDelete) {
+                    $imgTarget = $imageRepository->find($imageToDelete);
+                    if ($imgTarget) $trick = $mediaService->removeImage($trick, $imgTarget);
+                }
+            }
+
+            // IF PRESENT -> ADD IMAGE TO DB AND FILE FROM INPUT FILE SPOTLIGHT
+            // SPOTLIGHT VARIABLE USED TO NEXT TESTS
+            $spotlight = $form->get('spotlight')->getData();
+            $newImage = null;
+            if ($spotlight !== null) {
+                $newImage = $mediaService->upload($spotlight);
+                $trick->addImage($newImage);
+            }
+
+            // ADD IMAGE TO DB AND FILES FROM INPUT FILES
             $images = $form->get('images')->getData();
             if ($images !== null) {
                 foreach ($images as $image) {
-                    $imageName = md5(uniqid()) . '.' . $image->guessExtension();
-                    $image->move($this->getParameter('upload_tricks_directory'), $imageName);
-                    $newImage = new Image;
-                    if ($spotlight === null) {
-                        $spotlight = true;
-                        foreach ($trick->getImages() as $oldImage) {
-                            if ($oldImage->getType() == 'spotlight') $spotlight = false;
-                        }
-                        if ($spotlight) $newImage->setType('spotlight');
-                    }
-                    $newImage->setName($imageName);
-                    $newImage->setCreatedAt(new \DateTimeImmutable(('NOW')));
+                    $newImage = $mediaService->upload($image);
                     $trick->addImage(($newImage));
                 }
             }
 
-            $extraForm = $form->getExtraData();
-            if (isset($extraForm["video"])) {
-                foreach ($extraForm["video"] as $video) {
-                    preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $video, $match);
-                    if (isset($match[1])) {
-                        $youtubeCode = $match[1];
-                        $newVideo = new Video;
-                        $newVideo->setCreatedAt(new \DateTimeImmutable(('NOW')))
-                            ->setEmbed($youtubeCode);
-                        $trick->addVideo(($newVideo));
+            $entityManagerInterface->persist($trick);
+            $entityManagerInterface->flush();
+
+            // IF NEW SPOTLIGHT IMAGE (TYPE TO NULL ON OLD SPOTLIGHT IF EXIST) -> UPDATE TYPE OF FIRST IMAGE TO SPOTLIGHT
+            // IF NOT NEW SPOTLIGHT IMAGE -> UPDATE TYPE OF FIRST IMAGE TO SPOTLIGHT IF SPOTLIGHT DON'T EXIST YET
+            $images = $trick->getImages();
+            if (count($images) > 0) {
+                $imageSpotlight = $imageRepository->findOneBy(['trick' => $trick, 'Type' => 'spotlight']);
+                if ($spotlight !== null) {
+                    if ($imageSpotlight) {
+                        $imageSpotlight->setType(null);
+                    }
+                    $newImage->setType('spotlight');
+                } else {
+                    if (!$imageSpotlight) {
+                        $images[0]->setType('spotlight');
                     }
                 }
             }
-
-            if (isset($extraForm["imageToDelete"])) {
-                foreach ($extraForm["imageToDelete"] as $imageToDelete) {
-                    $imgTarget = $imageRepository->find($imageToDelete);
-                    $entityManagerInterface->remove($imgTarget);
-                    $fileSystem = new Filesystem();
-                    $fileSystem->remove($this->getParameter('upload_tricks_directory') . '/' . $imgTarget->getName());
-                }
-            }
-
-            if (isset($extraForm["videoToDelete"])) {
-                foreach ($extraForm["videoToDelete"] as $videoToDelete) {
-                    $videoTarget = $videoRepository->find($videoToDelete);
-                    $entityManagerInterface->remove($videoTarget);
-                }
-            }
-
             $entityManagerInterface->flush();
 
             $this->addFlash('success', 'Your Trick is updated !');
@@ -229,17 +226,19 @@ class TrickController extends AbstractController
     }
 
     #[Route('/deleteTrick/{slug}', name: 'app_delete_trick')]
-    public function deleteTrick(string $slug, TrickRepository $trickRepository, EntityManagerInterface $entityManagerInterface): Response
-    {
-        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+    public function deleteTrick(
+        Trick $trick,
+        MediaService $mediaService,
+        EntityManagerInterface $entityManagerInterface
+    ): Response {
 
+        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
         if ($user = $this->getUser()) {
             if ($user->isConfirmed() == true) {
-                $trick = $trickRepository->findOneBy(['slug' => $slug]);
+                //$trick = $trickRepository->findOneBy(['slug' => $slug]);
                 $images = $trick->getImages();
-                $fileSystem = new Filesystem();
                 foreach ($images as $image) {
-                    $fileSystem->remove($this->getParameter('upload_tricks_directory') . '/' . $image->getName());
+                    $trick = $mediaService->removeImage($trick, $image);
                 }
                 $entityManagerInterface->remove($trick);
                 $entityManagerInterface->flush();

@@ -53,7 +53,7 @@
 
 		<div class="row justify-content-center">
 			<div class="col-md-12">
-				<p class="mt-5 fs-5 text-pink">Auteur(e) :</p>
+				<p class="mt-5 fs-5 text-pink">Author :</p>
 				<div class="d-flex align-items-center gap-2">
 					{% if trick.userId.image is defined %}
 						<img src="{{ asset('upload/profiles/'~trick.userId.image) }}" style="width:150px;height:150px" class="rounded-circle shadow img-fluid"/>
@@ -65,7 +65,7 @@
 				</div>
 			</div>
 			<div class="col-md-12">
-				<p class="mt-5 fs-5 text-pink">Figure :<span class=" text-dark">
+				<p class="mt-5 fs-5 text-pink">Trick Name :<span class=" text-dark">
 						{{trick.name}}</span>
 				</p>
 				<p class="mt-3 mb-0 fs-5 text-pink">Description</p>
@@ -73,17 +73,17 @@
 			</div>
 		</div>
 				<div class="text-center fs-6 mt-5 d-flex justify-content-center flex-wrap" style="column-gap:15px">
-			<span>Ajouté le
-				{{trick.createdAt | date('d/m/Y')}}
-				à
+			<span>Created the
+				{{trick.createdAt | date('Y-m-d')}}
+				at
 				{{trick.createdAt | date('H\\hi')}}
 			</span>
 			<span class="d-none d-md-block">
 				<i class="fa-solid fa-asterisk"></i>
 			</span>
-			<span>Modifié le
-				{{trick.modifiedAt | date('d/m/Y')}}
-				à
+			<span>Modified the
+				{{trick.modifiedAt | date('Y-m-d')}}
+				at
 				{{trick.modifiedAt | date('H\\hi')}}</span>
 		</div>
 

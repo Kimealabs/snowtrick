@@ -6,7 +6,7 @@
 				<img src="{{ asset('assets/img/nologo.jpg') }}" class="rounded-circle shadow" style="width:40px;height:40px"/>
 			{% endif %}
 			<div>
-				<p>Posted by <b>{{ post.userId.username }}</b> on {{ post.createdAt | date('d/m/Y') }} at {{ post.createdAt | date('H:i') }}</p>
+				<p>Posted by <b>{{ post.userId.username }}</b> on {{ post.createdAt | date('Y-m-d') }} at {{ post.createdAt | date('H\\hi') }}</p>
 				<p>{{ post.content }}</p>
 			</div>
 		</div>

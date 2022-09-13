@@ -13,12 +13,13 @@ class UserVoter extends Voter
     public const ONLY_CONNECTED_NOT_CONFIRMED = 'only_connected_not_confirmed';
     public const ONLY_CONNECTED_CONFIRMED = 'only_connected_confirmed';
 
+    // SEE AccessDeniedListener (EventSubscriberInterface) INTO SECURITY FOR PROFILES ACTIONS
 
     protected function supports(string $attribute, $subject): bool
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, [self::ONLY_NOT_CONNECTED, self::CONNECTED, self::ONLY_CONNECTED_CONFIRMED]);
+        return in_array($attribute, [self::ONLY_NOT_CONNECTED, self::CONNECTED, self::ONLY_CONNECTED_NOT_CONFIRMED, self::ONLY_CONNECTED_CONFIRMED]);
     }
 
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
