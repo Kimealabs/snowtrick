@@ -18,7 +18,7 @@ class UserVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, [self::ONLY_NOT_CONNECTED, self::CONNECTED, self::ONLY_CONNECTED_CONFIRMED]);
+        return in_array($attribute, [self::ONLY_NOT_CONNECTED, self::CONNECTED, self::ONLY_CONNECTED_NOT_CONFIRMED, self::ONLY_CONNECTED_CONFIRMED]);
     }
 
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool

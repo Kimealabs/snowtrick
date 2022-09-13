@@ -1,0 +1,18 @@
+{% extends './parts/base.html.twig' %}
+
+{% block title %}Page error
+{% endblock %}
+
+{% block body %}
+	<div class="container rounded p-4 shadow-lg" style="margin-top:100px;max-width:1000px;min-height:70vh">
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-6 mt-4 fs-5">
+				<h1 class="h3 mb-3 font-weight-normal text-center mb-5">Oups 404 !!!</h1>
+				<p class="mt-5 fs-4">
+                    The requested page couldn't be located. Checkout for any URL
+                    misspelling or <a href="{{ path('app_home') }}">return to the homepage</a>.
+                </p>
+			</div>
+		</div>
+	</div>
+{% endblock %}

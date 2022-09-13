@@ -70,8 +70,8 @@
             </div>
 			<div id="deleteZone"></div>
             <div class="d-flex gap-3 mt-5 justify-content-end">
-                <button class="btn btn-danger mt-5" onclick="document.location='{{ path('app_delete_trick', {'slug':trick.slug}) }}'">Delete</button>
-                <button type="submit" class="btn btn-dark mt-5">Save</button>
+                <button type="button" class="btn btn-lg btn-danger mt-5">Delete</button>
+                <button type="submit" class="btn btn-lg btn-dark mt-5">Save</button>
             </div>
 	    	{{ form_end(form) }}
 		</div>
@@ -82,28 +82,32 @@
 {% block JS %}
 let video = 0
 document.querySelector('.fa-square-plus').addEventListener('click', ()=> {
-    let target = document.querySelector('.youtube')
-    let newInput = document.createElement('input')
-    newInput.setAttribute('name', 'create_trick_form[video][]')
-    newInput.setAttribute('id', 'video'+video)
-    newInput.setAttribute('placeholder', 'https://youtu.be/abcdefghijkl or empty')
-    newInput.classList.add('form-control', 'mt-2')
-    target.append(newInput)
-    video++
+    let target = document.querySelector('.youtube');
+    let newInput = document.createElement('input');
+    newInput.setAttribute('name', 'create_trick_form[video][]');
+    newInput.setAttribute('id', 'video'+video);
+    newInput.setAttribute('placeholder', 'https://youtu.be/abcdefghijkl or empty');
+    newInput.classList.add('form-control', 'mt-2');
+    target.append(newInput);
+    video++;
+})
+
+document.querySelector('.btn-danger').addEventListener('click', ()=> {
+	document.location='{{ path('app_delete_trick', {'slug':trick.slug}) }}'
 })
 
 function deleteZone(type, id) {
-	let deleteDiv = document.querySelector('#deleteZone')
+	let deleteDiv = document.querySelector('#deleteZone');
 	if (type == 'image') {
-		deleteDiv.innerHTML+= `<input type="hidden" name="create_trick_form[imageToDelete][]" value=${id}" />`
-		document.querySelector('#i'+id).src = "{{ asset('assets/img/deleted.jpg') }}"
-		document.querySelector('#trash_i'+id).remove()
+		deleteDiv.innerHTML+= `<input type="hidden" name="create_trick_form[imageToDelete][]" value=${id}" />`;
+		document.querySelector('#i'+id).src = "{{ asset('assets/img/deleted.jpg') }}";
+		document.querySelector('#trash_i'+id).remove();
 	}
 	else {
-		deleteDiv.innerHTML+= `<input type="hidden" name="create_trick_form[videoToDelete][]" value=${id}" />`
-		document.querySelector('#v'+id).src = "{{ asset('assets/img/deleted.jpg') }}"
-		document.querySelector('#trash_v'+id).remove()
-		document.querySelector('#icon_v'+id).remove()
+		deleteDiv.innerHTML+= `<input type="hidden" name="create_trick_form[videoToDelete][]" value=${id}" />`;
+		document.querySelector('#v'+id).src = "{{ asset('assets/img/deleted.jpg') }}";
+		document.querySelector('#trash_v'+id).remove();
+		document.querySelector('#icon_v'+id).remove();
 	}
 }
 {% endblock %}
