@@ -29,7 +29,7 @@ class AppFixtures extends Fixture
         $users = [];
         $categories = [];
         $categoriesFinded = ['Grabs', 'Rotations', 'Flips', 'Rotations désaxées', 'Slides', 'One foot', 'Old school'];
-        $tricksName = ['Air', 'Ollie', 'Nollie', 'Frontflip', 'Backflip', 'BS 180', 'FS Invert', 'FS Rodeo 540', 'Frontroll', 'Backroll'];
+        $tricksName = ['Air', 'Ollie', 'nollie', 'frontflip', 'backflip', 'bs 180', 'fs invert', 'fs rodeo 540', 'frontroll', 'backroll'];
 
         for ($i = 0; $i < 10; $i++) {
             $user = new User();
