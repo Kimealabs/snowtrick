@@ -55,6 +55,7 @@ class RegistrationController extends AbstractController
         ]);
     }
 
+    // MESSAGE PAGE OF SENDING VALIDATION EMAIL
     #[Route('/registerValidate', name: 'app_register_validate')]
     public function validateRegisterUser()
     {
@@ -62,6 +63,7 @@ class RegistrationController extends AbstractController
         return $this->render('registration/validate_user.html.twig', []);
     }
 
+    // LINK INTO VERIFICATION EMAIL POINT THIS PAGE
     #[Route('/validAccount/{token}', name: 'app_verify_user')]
     public function verifyUser(string $token, JWTService $jwt, UserRepository $userRepository, EntityManagerInterface $em)
     {
@@ -71,25 +73,26 @@ class RegistrationController extends AbstractController
             if ($user && !$user->isConfirmed()) {
                 $user->setConfirmed(1);
                 $em->flush($user);
-                $this->addFlash('success', 'Votre compte a été validé !');
+                $this->addFlash('success', 'Your account is verified !');
                 return $this->redirectToRoute('app_profile');
             }
-            $this->addFlash('danger', 'Le lien est invalide');
+            $this->addFlash('danger', 'Invalid link');
             return $this->redirectToRoute('app_home');
         }
         if (!$jwt->isValid($token) || !$jwt->check($token, $this->getParameter('jwt_secret'))) {
-            $this->addFlash('danger', 'Le lien est invalide');
-        } elseif (!$jwt->isExpired($token)) $this->addFlash('danger', 'Le lien a expiré !');
+            $this->addFlash('danger', 'Invalid link');
+        } elseif (!$jwt->isExpired($token)) $this->addFlash('danger', 'The link has expired !');
         return $this->redirectToRoute('app_home');
     }
 
+    // RESEND OF VALIDATION LINK
     #[Route('/resendValidationAccount', name: 'app_resend_validation')]
     public function resendValidationRequest(UserTools $userTools)
     {
         $this->denyAccessUnlessGranted('only_connected_not_confirmed', $this->getUser());
         if ($user = $this->getUser()) {
             if (!$user->isConfirmed()) {
-                $userTools->sendToken($user, 'Renvoi de vérification du compte', 'register');
+                $userTools->sendToken($user, 'Resend account verification', 'register');
                 return $this->redirectToRoute('app_register_validate');
             }
         }
