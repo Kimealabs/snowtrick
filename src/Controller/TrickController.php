@@ -3,17 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\Post;
-use App\Entity\Image;
 use App\Entity\Trick;
 use App\Form\PostFormType;
 use App\Form\CreateTrickFormType;
-use App\Repository\ImageRepository;
+use App\Security\Voter\UserVoter;
 use App\Repository\PostRepository;
+use App\Repository\ImageRepository;
 use App\Repository\TrickRepository;
 use App\Repository\VideoRepository;
 use App\Service\Media\MediaService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,7 +35,7 @@ class TrickController extends AbstractController
         $form = $this->createForm(PostFormType::class, $post);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+            $this->denyAccessUnlessGranted(UserVoter::ONLY_CONNECTED_CONFIRMED, $this->getUser());
 
             $post->setCreatedAt(new \DateTimeImmutable('NOW'));
             $post->setTrick($trick);
@@ -61,7 +60,7 @@ class TrickController extends AbstractController
         MediaService $mediaService,
         EntityManagerInterface $entityManagerInterface
     ): Response {
-        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+        $this->denyAccessUnlessGranted(UserVoter::ONLY_CONNECTED_CONFIRMED, $this->getUser());
 
         $trick = new Trick;
         $user = $this->getUser();
@@ -131,7 +130,7 @@ class TrickController extends AbstractController
         MediaService $mediaService,
         EntityManagerInterface $entityManagerInterface
     ): Response {
-        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+        $this->denyAccessUnlessGranted(UserVoter::ONLY_CONNECTED_CONFIRMED, $this->getUser());
 
         $user = $this->getUser();
         $form = $this->createForm(CreateTrickFormType::class, $trick);
@@ -229,7 +228,7 @@ class TrickController extends AbstractController
         EntityManagerInterface $entityManagerInterface
     ): Response {
 
-        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+        $this->denyAccessUnlessGranted(UserVoter::ONLY_CONNECTED_CONFIRMED, $this->getUser());
         if ($user = $this->getUser()) {
             if ($user->isConfirmed() == true) {
                 //$trick = $trickRepository->findOneBy(['slug' => $slug]);

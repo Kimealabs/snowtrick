@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Service\User\UserTools;
 use App\Service\Mail\JWTService;
+use App\Security\Voter\UserVoter;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use App\Security\UserAuthenticator;
@@ -26,7 +27,7 @@ class RegistrationController extends AbstractController
         UserAuthenticatorInterface $authenticator,
         UserAuthenticator $formAuthenticator
     ): Response {
-        $this->denyAccessUnlessGranted('only_not_connected', $this->getUser());
+        $this->denyAccessUnlessGranted(UserVoter::ONLY_NOT_CONNECTED, $this->getUser());
 
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -59,7 +60,7 @@ class RegistrationController extends AbstractController
     #[Route('/registerValidate', name: 'app_register_validate')]
     public function validateRegisterUser()
     {
-        $this->denyAccessUnlessGranted('only_connected_confirmed', $this->getUser());
+        $this->denyAccessUnlessGranted(UserVoter::ONLY_CONNECTED_CONFIRMED, $this->getUser());
         return $this->render('registration/validate_user.html.twig', []);
     }
 
@@ -89,7 +90,7 @@ class RegistrationController extends AbstractController
     #[Route('/resendValidationAccount', name: 'app_resend_validation')]
     public function resendValidationRequest(UserTools $userTools)
     {
-        $this->denyAccessUnlessGranted('only_connected_not_confirmed', $this->getUser());
+        $this->denyAccessUnlessGranted(UserVoter::ONLY_CONNECTED_NOT_CONFIRMED, $this->getUser());
         if ($user = $this->getUser()) {
             if (!$user->isConfirmed()) {
                 $userTools->sendToken($user, 'Resend account verification', 'register');

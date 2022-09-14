@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\Security\Voter\UserVoter;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -29,16 +30,16 @@ class AccessDeniedListener implements EventSubscriberInterface
         }
 
         $message = "Access Denied";
-        if ($exception->getAttributes()[0] == 'only_not_connected') {
+        if ($exception->getAttributes()[0] == UserVoter::ONLY_NOT_CONNECTED) {
             $message = "Only not connected ressource, Please logout !";
         }
-        if ($exception->getAttributes()[0] == 'only_connected_confirmed') {
+        if ($exception->getAttributes()[0] == UserVoter::ONLY_CONNECTED_CONFIRMED) {
             $message = "Only for Confirmed Account !";
         }
-        if ($exception->getAttributes()[0] == 'only_connected_not_confirmed') {
+        if ($exception->getAttributes()[0] == UserVoter::ONLY_CONNECTED_NOT_CONFIRMED) {
             $message = "Only for Not Confirmed Account !";
         }
-        if ($exception->getAttributes()[0] == 'connected') {
+        if ($exception->getAttributes()[0] == UserVoter::CONNECTED) {
             $message = "Only logged User ressource !";
         }
 
