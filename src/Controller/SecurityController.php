@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Service\User\UserTools;
-use Doctrine\ORM\EntityManager;
 use App\Service\Mail\JWTService;
+use App\Security\Voter\UserVoter;
 use App\Repository\UserRepository;
 use App\Form\ResetPasswordFormType;
 use App\Form\ForgottenPasswordFormType;
@@ -15,7 +15,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 
 class SecurityController extends AbstractController
 {
@@ -33,7 +32,7 @@ class SecurityController extends AbstractController
     #[Route(path: '/forgottenPassword', name: 'app_forgotten_password')]
     public function forgottenPassword(Request $request, UserTools $userTools, UserRepository $userRepo): Response
     {
-        $this->denyAccessUnlessGranted('only_not_connected', $this->getUser());
+        $this->denyAccessUnlessGranted(UserVoter::ONLY_NOT_CONNECTED, $this->getUser());
 
         $form = $this->createForm(ForgottenPasswordFormType::class);
         $form->handleRequest($request);
@@ -96,7 +95,7 @@ class SecurityController extends AbstractController
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
-        $this->denyAccessUnlessGranted('connected', $this->getUser());
+        $this->denyAccessUnlessGranted(UserVoter::CONNECTED, $this->getUser());
 
         $this->addFlash(
             'success',
