@@ -113,15 +113,17 @@ How to install and configure snowtricks
 
 Below is an example of how you can install on local with Docker and Symfony CLI.
 
-1. Clone the repo into your directory
-2. Make a composer update / composer install
-3. Change the database URL into .env with your database credentials and parameters (JWT_SECRET)
-4. Run docker-compose up  (or use Make file -> make start for 4-5 | make install for 4-5-6-7-8)
-5. symfony server:start
-6. symfony database:create
-7. symfony doctrine:migrations:migrate
-8. symfony doctrine:fixtures:load (add Categories, fictitious users and 10 examples of tricks into database)
-9. Change .env MAIL_DSN with your smtp system (if you don't want develop or use personal Email system)
+1. Clone the repo into your directory (got clone)
+2. Make a composer install / composer update
+3. Change the database URL into .env with your the credentials into docker-compose.yml
+   => MYSQL_DATABASE & MYSQL_ROOT_PASSWORD
+4. Change parameter (JWT_SECRET) into .env (best, in .env.test if you fork/push on Github with .gitignore)
+5. Run docker-compose up
+6. symfony server:start
+7. symfony console database:create
+8. symfony console doctrine:migrations:migrate
+9. symfony console doctrine:fixtures:load (add Categories, fictitious users and 10 examples of tricks into database)
+10. Change .env MAIL_DSN with your smtp system (if you don't want develop or use personal Email system)
 
 Now you can Open 127.0.0.1:8000 for Website into your Web Navigator
 * :8082 for PhpMyAdmin
