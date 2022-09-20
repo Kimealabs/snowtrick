@@ -116,6 +116,7 @@ Below is an example of how you can install on local with Docker and Symfony CLI.
 1. Clone the repo into your directory (got clone)
 2. Make a composer install / composer update
 3. Change the database URL into .env with your the credentials into docker-compose.yml
+
    => MYSQL_DATABASE & MYSQL_ROOT_PASSWORD
 4. Change parameter (JWT_SECRET) into .env (best, in .env.test if you fork/push on Github with .gitignore)
 5. Run docker-compose up
