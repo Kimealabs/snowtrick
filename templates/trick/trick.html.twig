@@ -55,7 +55,7 @@
 			<div class="col-md-12">
 				<p class="mt-5 fs-5 text-pink">Author :</p>
 				<div class="d-flex align-items-center gap-2">
-					{% if trick.userId.image is defined %}
+					{% if trick.userId.image is not null %}
 						<img src="{{ asset('upload/profiles/'~trick.userId.image) }}" style="width:150px;height:150px" class="rounded-circle shadow img-fluid"/>
 					{% else %}
 						<img src="{{ asset('assets/img/nologo.jpg') }}" style="width:150px;height:150px" class="rounded-circle shadow img-fluid"/>
