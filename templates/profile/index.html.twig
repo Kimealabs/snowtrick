@@ -36,7 +36,7 @@
 						<i class="text-danger fa-solid fa-circle-exclamation"></i>
 						Waiting for confirmation
 						<div class="mt-5">
-							<button class="btn btn-warning shadow">Resend a confirmation request</button>
+							<button class="btn btn-warning shadow" onclick="document.location='{{ path('app_resend_validation') }}'">Resend a confirmation request</button>
 						</div>
 
 					{% endif %}
