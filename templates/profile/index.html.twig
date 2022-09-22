@@ -9,7 +9,7 @@
 			<div class="col-12 col-md-6 mt-4 fs-5">
 				<h1 class="h3 mb-3 font-weight-normal text-center mb-5">My account</h1>
 				<div class="d-flex align-items-center gap-2">
-					{% if app.user.image is defined %}
+					{% if app.user.image is not null %}
 						<img src="{{ asset('upload/profiles/'~app.user.image) }}" class="rounded-circle shadow" style="width:60px;height:60px"/>
 					{% else %}
 						<img src="{{ asset('assets/img/nologo.jpg') }}" class="rounded-circle shadow" style="width:60px;height:60px"/>
